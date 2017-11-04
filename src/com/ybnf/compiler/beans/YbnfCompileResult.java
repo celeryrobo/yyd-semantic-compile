@@ -35,6 +35,10 @@ public class YbnfCompileResult {
 	public String getService() {
 		return service;
 	}
+	
+	public void setService(String service) {
+		this.service = service;
+	}
 
 	public Map<String, String> getObjects() {
 		return objects;
