@@ -12,14 +12,14 @@ public interface SemanticContext {
 	void loadByUserIdentify(String userIdentify);
 
 	/**
-	 * 当前所在场景
+	 * 上一次请求所在场景
 	 * 
 	 * @return 场景标识字符串
 	 */
 	String getService();
 
 	/**
-	 * 设置当前场景
+	 * 上一次请求当前场景
 	 * 
 	 * @param service
 	 *            场景标识字符串
@@ -27,7 +27,7 @@ public interface SemanticContext {
 	void setService(String service);
 
 	/**
-	 * 获取上次语义参数信息
+	 * 获取上次请求设置的语义参数信息
 	 * 
 	 * @return 语义实体字典
 	 */
