@@ -1,6 +1,7 @@
 package com.ybnf.compiler.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -117,7 +118,7 @@ public class YbnfCompiler extends Compiler {
 		if (callables == null) {
 			return result;
 		}
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> params = new HashMap<String, String>();
 		for (Object callable : callables) {
 			Object[] objs = (Object[]) callable;
 			String rs = call(text, objs);
@@ -128,7 +129,11 @@ public class YbnfCompiler extends Compiler {
 			for (Object object : objs) {
 				var.append(object).append("_");
 			}
-			sb.append(var).append(" = ").append(rs).append(";");
+			params.put(var.toString(), rs);
+		}
+		StringBuilder sb = new StringBuilder();
+		for (Map.Entry<String, String> entry : params.entrySet()) {
+			sb.append(entry.getKey()).append(" = ").append(entry.getValue()).append(";");
 		}
 		try {
 			result = new YbnfCompiler("#YBNF 0.1 utf8;" + sb.toString()).getGrammar();
