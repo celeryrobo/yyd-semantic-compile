@@ -1,14 +1,24 @@
 package com.ybnf.compiler.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.ybnf.compiler.Compiler;
 import com.ybnf.compiler.Include;
 import com.ybnf.compiler.beans.YbnfCompileResult;
+import com.ybnf.semantic.SemanticCallable;
+
+import clojure.lang.APersistentMap;
+import clojure.lang.RT;
+import clojure.lang.Var;
 
 public class YbnfCompiler extends Compiler {
 	private String classRootPath;
+	private List<Compiler> compilers;
+	private SemanticCallable semanticCallable;
+	private final static Var INTO = RT.var("clojure.core", "into");
 
 	public YbnfCompiler(String ybnf) throws Exception {
 		super(ybnf);
@@ -16,31 +26,68 @@ public class YbnfCompiler extends Compiler {
 
 	@Override
 	public void includes() throws Exception {
+		if (compilers == null) {
+			compilers = new ArrayList<Compiler>();
+		}
 		Set<String> filenames = getFilenames();
 		if (filenames == null)
 			return;
 		for (String filename : filenames) {
 			Compiler compiler = getInclude(convertIncludeFilepath(filename)).compiler();
-			mergeGrammar(compiler.getGrammar().trim());
-			mergeKeyValue(compiler.getKeyValue());
+			compilers.add(compiler);
 		}
 	}
-	
+
+	@Override
+	public String getGrammar() {
+		String grammarLang = super.getGrammar();
+		StringBuilder grammar = new StringBuilder(grammarLang.trim());
+		for (Compiler compiler : compilers) {
+			grammar.append("\n").append(compiler.getGrammar());
+		}
+		return grammar.toString();
+	}
+
+	@Override
+	public APersistentMap getKeyValue() {
+		Object result = super.getKeyValue();
+		for (Compiler compiler : compilers) {
+			result = INTO.invoke(result, compiler.getKeyValue());
+		}
+		return (APersistentMap) result;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public ArrayList getCallable() {
+		ArrayList callables = super.getCallable();
+		if (callables == null) {
+			callables = new ArrayList<>();
+		}
+		for (Compiler compiler : compilers) {
+			ArrayList calls = compiler.getCallable();
+			if (calls != null) {
+				callables.addAll(calls);
+			}
+		}
+		return callables;
+	}
+
 	private String getClassPath() {
-		if(classRootPath == null) {
+		if (classRootPath == null) {
 			classRootPath = this.getClass().getResource("/").getPath();
 		}
 		return classRootPath;
 	}
-	
+
 	public String convertIncludeFilepath(String filepath) {
-		if(filepath.startsWith("classpath:")) {
+		if (filepath.startsWith("classpath:")) {
 			String[] filenames = filepath.split(":", 2);
 			return getClassPath() + filenames[1];
-		}else if(filepath.startsWith("file:")) {
+		} else if (filepath.startsWith("file:")) {
 			String[] filenames = filepath.split(":", 2);
 			return filenames[1];
-		}else {
+		} else {
 			return filepath;
 		}
 	}
@@ -61,5 +108,55 @@ public class YbnfCompiler extends Compiler {
 		Map<String, String> objects = (Map<String, String>) result.get("objects");
 		Map<String, String> slots = (Map<String, String>) result.get("slots");
 		return new YbnfCompileResult(text, getVersion(), getCharset(), getService(), objects, slots);
+	}
+
+	@Override
+	public String runCallable(String text) {
+		String result = "";
+		ArrayList<?> callables = getCallable();
+		if (callables == null) {
+			return result;
+		}
+		StringBuilder sb = new StringBuilder();
+		for (Object callable : callables) {
+			Object[] objs = (Object[]) callable;
+			String rs = call(text, objs);
+			if (rs == null) {
+				continue;
+			}
+			StringBuilder var = new StringBuilder("$_call_");
+			for (Object object : objs) {
+				var.append(object).append("_");
+			}
+			sb.append(var).append(" = ").append(rs).append(";");
+		}
+		try {
+			result = new YbnfCompiler("#YBNF 0.1 utf8;" + sb.toString()).getGrammar();
+			System.out.println("======================================================");
+			System.out.println(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public String call(String text, Object... args) {
+		Object callName = args[0];
+		Object[] params = {};
+		if (args.length > 1) {
+			params = new Object[args.length - 1];
+			for (int i = 1; i < args.length; i++) {
+				params[i - 1] = args[i];
+			}
+		}
+		if (semanticCallable == null) {
+			return "'" + text + "'";
+		}
+		return semanticCallable.call(text, callName, params);
+	}
+
+	@Override
+	public void setSemanticCallable(SemanticCallable semanticCallable) {
+		this.semanticCallable = semanticCallable;
 	}
 }

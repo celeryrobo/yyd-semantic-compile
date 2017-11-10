@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ybnf.compiler.beans.YbnfCompileResult;
+import com.ybnf.semantic.SemanticCallable;
+
 import ybnf.compiler;
 
 public abstract class Compiler extends compiler {
@@ -64,7 +66,9 @@ public abstract class Compiler extends compiler {
 	public String getCharset() {
 		return charset;
 	}
-
+	
+	public abstract void setSemanticCallable(SemanticCallable semanticCallable);
+	
 	public abstract void includes () throws Exception;
 
 	public abstract YbnfCompileResult compile(String text);
