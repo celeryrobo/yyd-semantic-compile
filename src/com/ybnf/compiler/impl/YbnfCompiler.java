@@ -162,6 +162,8 @@ public class YbnfCompiler extends Compiler {
 
 	@Override
 	public void setSemanticCallable(SemanticCallable semanticCallable) {
-		this.semanticCallable = semanticCallable;
+		if (this.semanticCallable == null) {
+			this.semanticCallable = semanticCallable;
+		}
 	}
 }
