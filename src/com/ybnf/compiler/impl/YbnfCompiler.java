@@ -119,8 +119,8 @@ public class YbnfCompiler extends Compiler {
 			return result;
 		}
 		Map<String, String> params = new HashMap<String, String>();
-		for (Object callable : callables) {
-			Object[] objs = (Object[]) callable;
+		for (int i = 0; i < callables.size(); i++) {
+			Object[] objs = (Object[]) callables.get(i);
 			String rs = call(text, objs);
 			if (rs == null) {
 				continue;
