@@ -20,6 +20,7 @@ public class YbnfCompiler extends Compiler {
 	private List<Compiler> compilers;
 	private SemanticCallable semanticCallable;
 	private final static Var INTO = RT.var("clojure.core", "into");
+	private ArrayList<?> callables = null;
 
 	public YbnfCompiler(String ybnf) throws Exception {
 		super(ybnf);
@@ -60,15 +61,22 @@ public class YbnfCompiler extends Compiler {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public ArrayList getCallable() {
-		ArrayList callables = super.getCallable();
+	public ArrayList<?> getCallable() {
 		if (callables == null) {
-			callables = new ArrayList<>();
-		}
-		for (Compiler compiler : compilers) {
-			ArrayList calls = compiler.getCallable();
-			if (calls != null) {
-				callables.addAll(calls);
+			synchronized (this) {
+				if (callables == null) {
+					callables = new ArrayList<>();
+					ArrayList calls = super.getCallable();
+					if (calls != null) {
+						callables.addAll(calls);
+					}
+					for (Compiler compiler : compilers) {
+						calls = compiler.getCallable();
+						if (calls != null) {
+							callables.addAll(calls);
+						}
+					}
+				}
 			}
 		}
 		return callables;
@@ -119,17 +127,19 @@ public class YbnfCompiler extends Compiler {
 			return result;
 		}
 		Map<String, String> params = new HashMap<String, String>();
-		for (int i = 0; i < callables.size(); i++) {
-			Object[] objs = (Object[]) callables.get(i);
-			String rs = call(text, objs);
-			if (rs == null) {
-				continue;
+		synchronized (this) {
+			for (Object callable : callables) {
+				Object[] objs = (Object[]) callable;
+				String rs = call(text, objs);
+				if (rs == null) {
+					continue;
+				}
+				StringBuilder var = new StringBuilder("$_call_");
+				for (Object object : objs) {
+					var.append(object).append("_");
+				}
+				params.put(var.toString(), rs);
 			}
-			StringBuilder var = new StringBuilder("$_call_");
-			for (Object object : objs) {
-				var.append(object).append("_");
-			}
-			params.put(var.toString(), rs);
 		}
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, String> entry : params.entrySet()) {
