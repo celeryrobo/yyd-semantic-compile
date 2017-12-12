@@ -14,13 +14,18 @@ import com.ybnf.compiler.utils.YbnfStruct;
 
 import clojure.lang.Keyword;
 import clojure.lang.Sequential;
+import ybnf.jutils;
 
 class Engine {
 	private static Object schema = null;
 
 	public Engine() {
 		if (schema == null) {
-			schema = CompilerUtils.parser(CompilerUtils.getResourcePath("grammar.bnf"));
+			try {
+				schema = CompilerUtils.parser(jutils.getGrammar());
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 
@@ -39,6 +44,7 @@ public class JCompiler implements ICompiler {
 
 	public JCompiler(String grammar) throws Exception {
 		ybnfStruct = convertGrammar(grammar);
+		ybnfStruct.initGrammarSchema();
 	}
 
 	public static YbnfStruct convertGrammar(String grammar) throws Exception {
@@ -87,7 +93,6 @@ public class JCompiler implements ICompiler {
 		if (CompilerUtils.isFailure(tree)) {
 			throw new Exception(CompilerUtils.toFailure(CompilerUtils.getFailure(tree)));
 		}
-		CompilerUtils.pprint(tree);
 		Map<String, VarnameStruct> kvs = ybnfStruct.getKvs();
 		Map<String, Object> rs = buildKeyword(tree, kvs);
 		Map<String, String> objects = new HashMap<>();
@@ -110,14 +115,7 @@ public class JCompiler implements ICompiler {
 	}
 
 	@Override
-	public YbnfCompileResult compile(String text) {
-		YbnfCompileResult result = null;
-		try {
-			result = execCompile(text);
-			System.out.println(result);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+	public YbnfCompileResult compile(String text) throws Exception {
+		return execCompile(text);
 	}
 }

@@ -3,6 +3,7 @@ package com.ybnf.compiler.utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import clojure.lang.IFn;
@@ -10,23 +11,18 @@ import clojure.lang.IPersistentMap;
 import clojure.lang.ISeq;
 import clojure.lang.Keyword;
 import clojure.lang.RT;
-import clojure.lang.Compiler;
 import instaparse.gll.Failure;
 
 public class CompilerUtils {
-	static {
-		Compiler.eval(RT.readString("(require 'instaparse.core)"));
-		Compiler.eval(RT.readString("(require 'clojure.pprint)"));
-	}
-	
 	private final static String CLOJURE_CORE = "clojure.core";
+	private final static IFn REQUIRE = RT.var(CLOJURE_CORE, "require");
 	private final static IFn KEYWORD = RT.var(CLOJURE_CORE, "keyword");
 	private final static IFn INTO = RT.var(CLOJURE_CORE, "into");
 	private final static IFn NEXT = RT.var(CLOJURE_CORE, "next");
 	private final static IFn FIRST = RT.var(CLOJURE_CORE, "first");
 	private final static IFn COUNT = RT.var(CLOJURE_CORE, "count");
 	private final static IFn HASHMAP = RT.var(CLOJURE_CORE, "hash-map");
-	
+
 	private final static String CLOJURE_PPRINT = "clojure.pprint";
 	private final static IFn PPRINT = RT.var(CLOJURE_PPRINT, "pprint");
 
@@ -36,7 +32,16 @@ public class CompilerUtils {
 	private final static IFn TRANSFORM = RT.var(INSTAPARSE_CORE, "transform");
 	private final static IFn GET_FAILURE = RT.var(INSTAPARSE_CORE, "get-failure");
 	private final static IFn IS_FAILURE = RT.var(INSTAPARSE_CORE, "failure?");
-
+	
+	static {
+		require("instaparse.core");
+		require("clojure.pprint");
+	}
+	
+	public static Object require(String ns) {
+		return REQUIRE.invoke(RT.readString(ns));
+	}
+	
 	public static Keyword keyword(String name) {
 		return (Keyword) KEYWORD.invoke(name);
 	}
@@ -72,7 +77,7 @@ public class CompilerUtils {
 	public static Object mapGet(Object map, Keyword kw) {
 		return kw.invoke(map);
 	}
-	
+
 	public static void pprint(Object o) {
 		PPRINT.invoke(o);
 	}
@@ -130,37 +135,45 @@ public class CompilerUtils {
 	}
 
 	public static String getResourcePath(String name) {
-		return ClassLoader.getSystemResource(name).getPath();
+		return CompilerUtils.class.getResource("/").getPath() + name;
 	}
 
 	public static String readFile(String filename) throws Exception {
-		File file = new File(filename);
-		return readFile(file);
+		return readFile(new File(filename));
 	}
 
 	public static String readFile(File file) throws Exception {
-		BufferedReader br = fileReader(file);
+		return readFile(fileReader(file));
+	}
+	
+	public static String readFile(InputStream inputStream) throws Exception {
+		return readFile(fileReader(inputStream));
+	}
+	
+	public static String readFile(BufferedReader bufferedReader) throws Exception {
 		StringBuilder sb = new StringBuilder();
 		String line;
-		while ((line = br.readLine()) != null) {
+		while ((line = bufferedReader.readLine()) != null) {
 			sb.append(line).append("\n");
 		}
-		br.close();
+		bufferedReader.close();
 		return sb.toString();
+	}
+
+	public static BufferedReader fileReader(InputStream inputStream) throws Exception {
+		InputStreamReader isr = new InputStreamReader(inputStream, "UTF-8");
+		return new BufferedReader(isr);
 	}
 
 	public static BufferedReader fileReader(File file) throws Exception {
 		BufferedReader br = null;
 		if (file.exists()) {
-			FileInputStream fis = new FileInputStream(file);
-			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-			br = new BufferedReader(isr);
+			br = fileReader(new FileInputStream(file));
 		}
 		return br;
 	}
 
 	public static BufferedReader fileReader(String filename) throws Exception {
-		File file = new File(filename);
-		return fileReader(file);
+		return fileReader(new File(filename));
 	}
 }

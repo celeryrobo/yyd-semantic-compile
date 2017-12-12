@@ -229,7 +229,7 @@ public class ParserUtils {
 			String filename = (String) arglist.first();
 			if (filename.startsWith("classpath:")) {
 				String[] filenames = filename.split(":", 2);
-				return CompilerUtils.getResourcePath("") + filenames[1];
+				return CompilerUtils.getResourcePath(filenames[1]);
 			} else if (filename.startsWith("file:")) {
 				String[] filenames = filename.split(":", 2);
 				return filenames[1];

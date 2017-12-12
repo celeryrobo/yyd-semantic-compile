@@ -110,16 +110,18 @@ public class YbnfStruct {
 		return sb.toString().trim();
 	}
 
+	public synchronized void initGrammarSchema() {
+		if (grammarSchema == null) {
+			includes();
+			String grammar = mergeGrammar() + "\n" + buildCallTempVars();
+			System.out.println(grammar);
+			grammarSchema = CompilerUtils.parser(grammar);
+		}
+	}
+
 	public Object genSchema(String lang) throws Exception {
 		if (grammarSchema == null) {
-			synchronized (this) {
-				if (grammarSchema == null) {
-					includes();
-					String grammar = mergeGrammar() + "\n" + buildCallTempVars();
-					System.out.println(grammar);
-					grammarSchema = CompilerUtils.parser(grammar);
-				}
-			}
+			initGrammarSchema();
 		}
 		Object schema = grammarSchema;
 		String callBuffer = runCallables(lang);
