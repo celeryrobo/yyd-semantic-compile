@@ -1,0 +1,31 @@
+root = head [callable] [mainArg] body
+body = {define}
+head = <'#YBNF'> space version space charset semicolon {include} [modeArg]
+version = #'\d+\.\d+'
+charset = 'utf8' | 'UTF8' | 'utf-8' | 'UTF-8'
+include = <'#include'> space filename semicolon
+filename = #'.+\.ybnf'
+<modeArg> = <'service'> space service semicolon
+service = word
+callable = <'callable'> space call {comma call} semicolon
+call = <'@'> word <'('> {space} {word {comma word}} {space} <')'>
+<mainArg> = <'root'> space main semicolon
+main = variable
+define = {space} varname {space} <'='> {space} sentence semicolon
+varname = variable [<'{'> {space} key [ {space} <'%'> {space} value] {space} <'}'>]
+variable = <'$'> word
+key = word
+value = word
+<sentNotOr> = text | variable | choices | ranges | group | zeroMore
+sentence = ((sentNotOr | orr) {space})+
+choices = <'['> {space} sentence {space} <']'>
+ranges = variable <'<'> {space} number [comma number] {space} <'>'>
+orr = sentNotOr {space} (<'|'> {space} sentNotOr {space})+
+group = <'('> {space} sentence <')'>
+zeroMore = <'{'> {space} sentence <'}'>
+text = #'[0-9A-Za-z\p{script=Han}]+'
+<number> = #'\d+'
+<word> = #'\w+'
+<semicolon> = <#'\s*;\s*'>
+<comma> = <#'\s*,\s*'>
+<space> = <#'\s+'>

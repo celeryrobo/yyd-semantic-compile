@@ -10,7 +10,7 @@ import com.ybnf.semantic.SemanticCallable;
 
 import ybnf.compiler;
 
-public abstract class Compiler extends compiler {
+public abstract class Compiler extends compiler implements ICompiler {
 	private Set<String> filenames = null;
 	private String service = null;
 	private String version = null;
