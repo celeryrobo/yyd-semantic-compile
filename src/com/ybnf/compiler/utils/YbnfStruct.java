@@ -126,6 +126,7 @@ public class YbnfStruct {
 		Object schema = grammarSchema;
 		String callBuffer = runCallables(lang);
 		if (!callBuffer.isEmpty()) {
+			System.out.println("Service's Name : " + getService());
 			StringBuilder sb = new StringBuilder("#YBNF ");
 			sb.append(getVersion()).append(" ").append(getCharset()).append(";\n").append(callBuffer);
 			YbnfStruct ybnfStruct = JCompiler.convertGrammar(sb.toString());
