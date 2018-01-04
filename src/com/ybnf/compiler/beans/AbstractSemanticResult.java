@@ -70,6 +70,11 @@ public abstract class AbstractSemanticResult {
 
 	public void setErrCode(Integer errCode) {
 		this.errCode = errCode;
+		if(errCode.equals(0)) {
+			setErrMsg("OK");
+		} else {
+			setErrMsg("Semantic Match Fail !");
+		}
 	}
 
 	public Operation getOperation() {
