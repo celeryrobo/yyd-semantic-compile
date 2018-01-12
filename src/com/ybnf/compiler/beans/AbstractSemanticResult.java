@@ -15,7 +15,11 @@ public abstract class AbstractSemanticResult {
 		/**
 		 * 机器人移动
 		 */
-		MOVE
+		MOVE,
+		/**
+		 * 打开第三方APP
+		 */
+		APP
 	}
 
 	public static enum ParamType {
