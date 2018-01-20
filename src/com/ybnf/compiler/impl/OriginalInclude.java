@@ -20,6 +20,7 @@ public class OriginalInclude extends Include {
 		sb.append("<_yyd_digital_> = #'\\d'\n<_yyd_num_> = _yyd_digital_+\n");
 		sb.append("<_yyd_lxkh_> = '('|'（'\n<_yyd_rxkh_> = ')'|'）'\n<_yyd_lzkh_> = '['|'【'\n<_yyd_rzkh_> = ']'|'】'\n<_yyd_ldkh_> = '{'\n<_yyd_rdkh_> = '}'\n");
 		sb.append("<_yyd_plus_> = '+'\n<_yyd_subtract_> = '-'\n<_yyd_multi_> = '*'|'×'\n<_yyd_division_> = '/'|'÷'\n");
+		sb.append("<_yyd_point_> = '.'\n");
 		return sb.toString();
 	}
 
