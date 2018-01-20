@@ -18,6 +18,7 @@ public class OriginalInclude extends Include {
 		sb.append("<_yyd_han_> = #'\\p{script=Han}'\n<_yyd_char_> = #'\\w'\n<_yyd_ch_> = _yyd_han_|_yyd_char_\n");
 		sb.append("<_yyd_wstr_> = _yyd_han_+\n<_yyd_str_> = _yyd_char_+\n<_yyd_string_> = _yyd_ch_+\n");
 		sb.append("<_yyd_digital_> = #'\\d'\n<_yyd_num_> = _yyd_digital_+\n");
+		sb.append("<_yyd_lxkh_> = '('|'（'\n<_yyd_rxkh_> = ')'|'）'\n<_yyd_lzkh_> = '['|'【'\n<_yyd_rzkh_> = ']'|'】'\n<_yyd_ldkh_> = '{'\n<_yyd_rdkh_> = '}'\n");
 		return sb.toString();
 	}
 
