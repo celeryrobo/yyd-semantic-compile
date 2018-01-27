@@ -66,8 +66,11 @@ public class YbnfStruct {
 		}
 		StringBuilder sb = new StringBuilder();
 		for (CallableStruct callableStruct : callableStructs) {
-			String semantic = semanticCallable.call(text, callableStruct.getCallName(),
-					callableStruct.getArgs().toArray());
+			String semantic = "'null'";
+			if (text != null && !"".equals(text)) {
+				semantic = semanticCallable.call(text, callableStruct.getCallName(),
+						callableStruct.getArgs().toArray());
+			}
 			sb.append("$_call_").append(callableStruct.getCallName());
 			for (Object arg : callableStruct.getArgs()) {
 				sb.append("_").append(arg);
@@ -116,6 +119,10 @@ public class YbnfStruct {
 			String grammar = mergeGrammar() + "\n" + buildCallTempVars();
 			System.out.println(grammar);
 			grammarSchema = CompilerUtils.parser(grammar);
+			try {
+				genSchema("");
+			} catch (Exception e) {
+			}
 		}
 	}
 
