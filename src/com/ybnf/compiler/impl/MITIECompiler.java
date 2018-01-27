@@ -16,18 +16,12 @@ import edu.mit.ll.mitie.TextCategorizer;
 import edu.mit.ll.mitie.TotalWordFeatureExtractor;
 
 public class MITIECompiler implements ICompiler {
-	private static Map<String, TextCategorizer> textCategorizers = null;
-	private static Map<String, NamedEntityExtractor> namedEntityExtractors = null;
+	private static Map<String, TextCategorizer> textCategorizers = new HashMap<>();
+	private static Map<String, NamedEntityExtractor> namedEntityExtractors = new HashMap<>();
 	private static TotalWordFeatureExtractor totalWordFeatureExtractor = null; // 公用语言模型（MITIE lib yyd自定义）
 	private TextCategorizer textCategorizer = null;
 	private NamedEntityExtractor namedEntityExtractor = null;
 	private StringVector possibleTags;
-
-	static {
-		System.loadLibrary("javamitie");
-		textCategorizers = new HashMap<>();
-		namedEntityExtractors = new HashMap<>();
-	}
 
 	public MITIECompiler(String categoryFilename, String namedEntityFilename, String featureExtractorFilename) {
 		if(totalWordFeatureExtractor == null) {
