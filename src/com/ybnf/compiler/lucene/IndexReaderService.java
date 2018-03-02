@@ -16,17 +16,19 @@ public class IndexReaderService extends LuceneService {
 		reader = DirectoryReader.open(directory);
 		searcher = new IndexSearcher(reader);
 	}
-	
-	public TopDocs search(Query query, int n) throws Exception {
-		return searcher.search(query, n);
-	}
-	
-	public TemplateEntity getTemplateEntity(ScoreDoc scoreDoc) throws Exception {
-		Document doc =  searcher.doc(scoreDoc.doc);
-		String service = doc.get("service");
-		String intent = doc.get("intent");
-		String template = doc.get("template");
-		return new TemplateEntity(service, intent, template);
+
+	public TemplateEntity search(Query query) throws Exception {
+		TemplateEntity entity = null;
+		TopDocs docs = searcher.search(query, 10);
+		if (docs.totalHits > 0) {
+			ScoreDoc scoreDoc = docs.scoreDocs[0];
+			Document doc = searcher.doc(scoreDoc.doc);
+			String service = doc.get("service");
+			String intent = doc.get("intent");
+			String template = doc.get("template");
+			entity = new TemplateEntity(service, intent, template);
+		}
+		return entity;
 	}
 
 	@Override
