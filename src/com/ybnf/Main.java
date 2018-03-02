@@ -3,9 +3,7 @@ package com.ybnf;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.ansj.library.DicLibrary;
 import org.apache.lucene.search.Query;
-import org.nlpcn.commons.lang.tire.domain.Forest;
 
 import com.ybnf.compiler.beans.YbnfCompileResult;
 import com.ybnf.compiler.lucene.IndexReaderService;
@@ -24,10 +22,6 @@ public class Main {
 		SemanticService service = new SemanticService("music");
 		initIntent(service, "play", tpls);
 		test(service, "我想听刘德华的歌");
-		Forest forest = DicLibrary.get();
-		for (String key : forest.toMap().keySet()) {
-			System.out.println(key);
-		}
 	}
 
 	private static void initIntent(SemanticService service, String name, List<String> tpls) throws Exception {
