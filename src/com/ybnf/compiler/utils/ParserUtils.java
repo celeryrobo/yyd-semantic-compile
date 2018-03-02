@@ -32,7 +32,7 @@ public class ParserUtils {
 			CompilerUtils.keyword("filename"), new Filename(), CompilerUtils.keyword("version"), new Version(),
 			CompilerUtils.keyword("charset"), new Charset(), CompilerUtils.keyword("service"), new Service() };
 
-	public static class Root extends AFn {
+	private static class Root extends AFn {
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object applyTo(ISeq arglist) {
@@ -44,7 +44,7 @@ public class ParserUtils {
 		}
 	}
 
-	public static class Head extends AFn {
+	private static class Head extends AFn {
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object applyTo(ISeq arglist) {
@@ -56,7 +56,7 @@ public class ParserUtils {
 		}
 	}
 
-	public static class Callable extends AFn {
+	private static class Callable extends AFn {
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object applyTo(ISeq arglist) {
@@ -68,7 +68,7 @@ public class ParserUtils {
 		}
 	}
 
-	public static class Call extends AFn {
+	private static class Call extends AFn {
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object applyTo(ISeq arglist) {
@@ -80,42 +80,42 @@ public class ParserUtils {
 		}
 	}
 
-	public static class Main extends AFn {
+	private static class Main extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return new Struct("root = " + arglist.first(), StructType.Main);
 		}
 	}
 
-	public static class Text extends AFn {
+	private static class Text extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return "'" + arglist.first() + "'";
 		}
 	}
 
-	public static class Variable extends AFn {
+	private static class Variable extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return arglist.first();
 		}
 	}
 
-	public static class Key extends AFn {
+	private static class Key extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return arglist.first();
 		}
 	}
 
-	public static class Value extends AFn {
+	private static class Value extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return arglist.first();
 		}
 	}
 
-	public static class Varname extends AFn {
+	private static class Varname extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			String name = null, key = null, value = null;
@@ -137,28 +137,28 @@ public class ParserUtils {
 		}
 	}
 
-	public static class Choices extends AFn {
+	private static class Choices extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return "[" + arglist.first() + "]";
 		}
 	}
 
-	public static class Group extends AFn {
+	private static class Group extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return "(" + arglist.first() + ")";
 		}
 	}
 
-	public static class ZeroMore extends AFn {
+	private static class ZeroMore extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return "{" + arglist.first() + "}";
 		}
 	}
 
-	public static class Ranges extends AFn {
+	private static class Ranges extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			Object varname = arglist.first();
@@ -177,21 +177,21 @@ public class ParserUtils {
 		}
 	}
 
-	public static class Sentence extends AFn {
+	private static class Sentence extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return CompilerUtils.join(arglist, " ");
 		}
 	}
 
-	public static class Define extends AFn {
+	private static class Define extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return new DefineStruct((VarnameStruct) arglist.first(), (String) arglist.next().first());
 		}
 	}
 
-	public static class Body extends AFn {
+	private static class Body extends AFn {
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object applyTo(ISeq arglist) {
@@ -209,21 +209,21 @@ public class ParserUtils {
 		}
 	}
 
-	public static class Orr extends AFn {
+	private static class Orr extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return CompilerUtils.join(arglist, "|");
 		}
 	}
 
-	public static class Include extends AFn {
+	private static class Include extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return new Header(arglist.first(), HeaderType.Include);
 		}
 	}
 
-	public static class Filename extends AFn {
+	private static class Filename extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			String filename = (String) arglist.first();
@@ -238,21 +238,21 @@ public class ParserUtils {
 		}
 	}
 
-	public static class Version extends AFn {
+	private static class Version extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return new Header(arglist.first(), HeaderType.Version);
 		}
 	}
 
-	public static class Charset extends AFn {
+	private static class Charset extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return new Header(arglist.first(), HeaderType.Charset);
 		}
 	}
 
-	public static class Service extends AFn {
+	private static class Service extends AFn {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			return new Header(arglist.first(), HeaderType.Service);
