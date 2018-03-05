@@ -23,8 +23,7 @@ public class ParserUtils {
 		while (tokenizer.hasMoreTokens()) {
 			parser(stack, tokenizer);
 		}
-		Sent sent = new Sent(stack);
-		return sent.build();
+		return new Sent(stack).build();
 	}
 
 	private static String parser(Stack<Node<?>> stack, StringTokenizer tokenizer) {
