@@ -16,12 +16,20 @@ import com.ybnf.compiler.lucene.TemplateEntity;
 public class Main {
 	public static void main(String[] args) throws Exception {
 		List<String> tpls = new LinkedList<>();
-		tpls.add("[[我] 想] 听 $singer 的歌");
-		tpls.add("[[我] 想] 听 $singer 的 $song");
+		tpls.add("[[[我] (想 | 要)] 听] $singer 的 (歌 | $song)");
+		tpls.add("[[我] (想 | 要)] 听 [[一] 首] (歌 | $song)");
 
 		SemanticService service = new SemanticService("music");
 		initIntent(service, "play", tpls);
-		test(service, "我想听刘德华的歌");
+
+		test(service, "听刘德华的冰雨");
+		long start = System.currentTimeMillis();
+		test(service, "听刘德华的冰雨吧");
+		test(service, "我想听刘德华的冰雨呀");
+		test(service, "我好想听刘德华的冰雨呀");
+		test(service, "我想听歌");
+		test(service, "我想听冰雨");
+		System.out.println(System.currentTimeMillis() - start);
 	}
 
 	private static void initIntent(SemanticService service, String name, List<String> tpls) throws Exception {
@@ -37,17 +45,18 @@ public class Main {
 	}
 
 	private static void test(SemanticService service, String lang) throws Exception {
+		SemanticSentence sentence = service.buildSentence(lang);
+		Query query = sentence.buildQuery("template");
+		System.out.println(query);
+		TemplateEntity entity = null;
 		try (IndexReaderService readerService = new IndexReaderService()) {
-			SemanticSentence sentence = service.buildSentence(lang);
-			Query query = sentence.buildQuery("template");
-			System.out.println(query);
-			TemplateEntity entity = readerService.search(query);
-			if (entity != null) {
-				YbnfCompileResult result = sentence.intent(entity.getIntent()).compile(entity.getTemplate());
-				System.out.println(result);
-			} else {
-				System.out.println("fail ...");
-			}
+			entity = readerService.search(query);
+		}
+		if (entity == null) {
+			System.out.println("fail ...");
+		} else {
+			YbnfCompileResult result = sentence.intent(entity.getIntent()).compile(entity.getTemplate());
+			System.out.println(result);
 		}
 	}
 }

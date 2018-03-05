@@ -16,7 +16,7 @@ public class TemplateBuilder {
 			builders.add(new StringBuilder(sb.toString()));
 		}
 	}
-	
+
 	public List<StringBuilder> getBuilders() {
 		return builders;
 	}
@@ -24,23 +24,39 @@ public class TemplateBuilder {
 	public boolean isEmpty() {
 		return builders.isEmpty();
 	}
-	
+
 	public void add(StringBuilder sb) {
 		builders.add(sb);
 	}
-	
+
 	public void add(TemplateBuilder builder) {
 		builders.addAll(builder.builders);
 	}
-	
-	public List<Template> build(){
+
+	public void append(StringBuilder sb) {
+		for (StringBuilder builder : builders) {
+			builder.append(sb);
+		}
+	}
+
+	public void append(TemplateBuilder builder) {
+		TemplateBuilder tplBuilder = new TemplateBuilder();
+		for (StringBuilder sb : builder.builders) {
+			TemplateBuilder tb = new TemplateBuilder(this);
+			tb.append(sb);
+			tplBuilder.add(tb);
+		}
+		builders = tplBuilder.builders;
+	}
+
+	public List<Template> build() {
 		List<Template> templates = new LinkedList<>();
 		for (StringBuilder sb : builders) {
 			templates.add(new Template(sb.toString().trim()));
 		}
 		return templates;
 	}
-	
+
 	@Override
 	public String toString() {
 		return builders.toString();

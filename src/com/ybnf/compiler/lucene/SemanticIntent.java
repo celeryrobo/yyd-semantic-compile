@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
-import java.util.StringTokenizer;
 
 import org.ansj.library.DicLibrary;
 import org.nlpcn.commons.lang.tire.domain.Forest;
@@ -42,7 +40,7 @@ public class SemanticIntent {
 	}
 
 	public void addTemplate(String bnfTpl) {
-		TemplateBuilder builder = build(buildTree(bnfTpl));
+		TemplateBuilder builder = ParserUtils.parse(bnfTpl);
 		for (Template template : builder.build()) {
 			addTemplate(template);
 		}
@@ -52,69 +50,13 @@ public class SemanticIntent {
 		return templates;
 	}
 
-	private List<Object> buildTree(String tpl) {
-		Stack<Object> stack = new Stack<>();
-		StringTokenizer tokenizer = new StringTokenizer(tpl, "[ ]", true);
-		while (tokenizer.hasMoreTokens()) {
-			Object token = tokenizer.nextToken();
-			if ("]".equals(token)) {
-				Stack<Object> kw = new Stack<>();
-				while (true) {
-					token = stack.pop();
-					if ("[".equals(token)) {
-						List<Object> objects = new LinkedList<>();
-						while (!kw.isEmpty()) {
-							objects.add(kw.pop());
-						}
-						stack.push(objects);
-						break;
-					}
-					kw.push(token);
-				}
-			} else if (!" ".equals(token)) {
-				stack.push(token);
-			}
-		}
-		return new LinkedList<>(stack);
-	}
-
-	@SuppressWarnings("unchecked")
-	private TemplateBuilder build(List<Object> tree) {
-		TemplateBuilder result = new TemplateBuilder();
-		result.add(new StringBuilder());
-		for (Object obj : tree) {
-			if (obj instanceof List) {
-				TemplateBuilder rs = build((List<Object>) obj);
-				TemplateBuilder builder = new TemplateBuilder();
-				for (StringBuilder sb : rs.getBuilders()) {
-					TemplateBuilder r = new TemplateBuilder(result);
-					for (StringBuilder b : r.getBuilders()) {
-						b.append(sb);
-					}
-					builder.add(r);
-				}
-				result.add(builder);
-			} else {
-				for (StringBuilder sb : result.getBuilders()) {
-					String token = (String) obj;
-					if (token.startsWith("$")) {
-						sb.append(" ").append(token).append(" ");
-					} else {
-						sb.append(obj);
-					}
-				}
-			}
-		}
-		return result;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder(name).append("[\n");
 		for (Template template : templates) {
 			builder.append("    ").append(template).append("\n");
 		}
-		builder.append("[");
+		builder.append("]");
 		return builder.toString();
 	}
 }
