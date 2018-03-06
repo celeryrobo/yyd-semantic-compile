@@ -7,13 +7,11 @@ import java.util.Set;
 
 public class SemanticService {
 	private String name;
-	private Set<String> entTypes;
 	private Map<String, SemanticIntent> intents;
 
 	public SemanticService(String name) {
 		this.name = name;
 		this.intents = new HashMap<>();
-		this.entTypes = new HashSet<>();
 	}
 
 	public String getName() {
@@ -23,22 +21,24 @@ public class SemanticService {
 	public Map<String, SemanticIntent> getIntents() {
 		return intents;
 	}
-
-	public void addIntent(SemanticIntent intent) {
-		String _name = intent.getName();
-		entTypes.addAll(intent.getEntTypes());
-		if (intents.containsKey(_name)) {
-			SemanticIntent _intent = intents.get(_name);
-			for (Template template : intent.getTemplates()) {
-				_intent.addTemplate(template);
-			}
-		} else {
-			intents.put(_name, intent);
+	
+	public SemanticIntent buildIntent(String intentName) {
+		SemanticIntent intent = null;
+		if(intents.containsKey(intentName)) {
+			intent = intents.get(intentName);
+		}else {
+			intent = new SemanticIntent(name, intentName);
+			intents.put(intentName, intent);
 		}
+		return intent;
 	}
 
 	public SemanticSentence buildSentence(String lang) {
-		return new SemanticSentence(name, lang, entTypes);
+		Set<String> types = new HashSet<>();
+		for (SemanticIntent intent : intents.values()) {
+			types.addAll(intent.getEntTypes());
+		}
+		return new SemanticSentence(name, lang, types);
 	}
 
 	@Override

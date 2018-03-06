@@ -12,72 +12,87 @@ import com.ybnf.compiler.lucene.tools.Text;
 import com.ybnf.compiler.lucene.tools.Varname;
 
 public class ParserUtils {
-	private static final Text CHOICE_LEFT = new Text("[");
+	private static final Text CHOICES_LEFT = new Text("[");
+	private static final Text CHOICES_RIGHT = new Text("]");
 	private static final Text GROUP_LEFT = new Text("(");
-	private static final Stack<Node<?>> KW_STACK = new Stack<>();
+	private static final Text GROUP_RIGHT = new Text(")");
 
-	public static TemplateBuilder parse(String lang) {
+	public static TemplateBuilder parse(String lang) throws Exception {
 		String grammar = lang.replaceAll("\\s+", " ");
 		StringTokenizer tokenizer = new StringTokenizer(grammar, "$[]()| ", true);
 		Stack<Node<?>> stack = new Stack<>();
 		while (tokenizer.hasMoreTokens()) {
-			parser(stack, tokenizer);
+			stack.push(parser(stack, tokenizer));
 		}
 		return new Sent(stack).build();
 	}
 
-	private static String parser(Stack<Node<?>> stack, StringTokenizer tokenizer) {
+	private static Node<?> parser(Stack<Node<?>> stack, StringTokenizer tokenizer) throws Exception {
+		final Stack<Node<?>> kvStack = new Stack<>();
 		String token = tokenizer.nextToken();
 		switch (token) {
-		case "]":
-			while (true) {
-				Node<?> node = stack.pop();
-				if (CHOICE_LEFT.equals(node)) {
-					break;
+		case "[":
+			stack.push(CHOICES_LEFT);
+			while (tokenizer.hasMoreTokens()) {
+				Node<?> node = parser(stack, tokenizer);
+				if (CHOICES_RIGHT.equals(node)) {
+					while (true) {
+						node = stack.pop();
+						if (CHOICES_LEFT.equals(node)) {
+							Choices choices = new Choices();
+							while (!kvStack.isEmpty()) {
+								choices.add(kvStack.pop());
+							}
+							return choices;
+						}
+						kvStack.push(node);
+					}
 				}
-				KW_STACK.push(node);
+				stack.push(node);
 			}
-			Choices choices = new Choices();
-			while (!KW_STACK.isEmpty()) {
-				choices.add(KW_STACK.pop());
-			}
-			stack.push(choices);
-			break;
-		case ")":
-			while (true) {
-				Node<?> node = stack.pop();
-				if (GROUP_LEFT.equals(node)) {
-					break;
+			throw new Exception("choices parser error !");
+		case "(":
+			stack.push(GROUP_LEFT);
+			while (tokenizer.hasMoreTokens()) {
+				Node<?> node = parser(stack, tokenizer);
+				if (GROUP_RIGHT.equals(node)) {
+					while (true) {
+						node = stack.pop();
+						if (GROUP_LEFT.equals(node)) {
+							Group group = new Group();
+							while (!kvStack.isEmpty()) {
+								group.add(kvStack.pop());
+							}
+							return group;
+						}
+						kvStack.push(node);
+					}
 				}
-				KW_STACK.push(node);
+				stack.push(node);
 			}
-			Group group = new Group();
-			while (!KW_STACK.isEmpty()) {
-				group.add(KW_STACK.pop());
-			}
-			stack.push(group);
-			break;
+			throw new Exception("group parser error !");
 		case "|":
-			do {
-				token = parser(stack, tokenizer);
-			} while (" ".equals(token));
-			Node<?> second = stack.pop();
-			Node<?> first = stack.pop();
-			stack.push(new Or(first, second));
-			break;
-		case "$":
-			token = parser(stack, tokenizer);
-			if (!" ".equals(token)) {
-				Node<?> text = stack.pop();
-				stack.push(new Varname(text));
+			if (tokenizer.hasMoreTokens()) {
+				Node<?> second = parser(stack, tokenizer);
+				Node<?> first = stack.pop();
+				return new Or(first, second);
 			}
-			break;
+			throw new Exception("or parser error !");
+		case "$":
+			if (tokenizer.hasMoreTokens()) {
+				Node<?> node = parser(stack, tokenizer);
+				if (node instanceof Text) {
+					return new Varname(node);
+				}
+			}
+			throw new Exception("varname parser error !");
 		case " ":
-			break;
+			if (tokenizer.hasMoreTokens()) {
+				return parser(stack, tokenizer);
+			}
+			throw new Exception("space parser error !");
 		default:
-			stack.push(new Text(token));
-			break;
+			return new Text(token);
 		}
-		return token;
 	}
 }

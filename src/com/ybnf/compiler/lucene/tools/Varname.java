@@ -15,7 +15,7 @@ public class Varname extends Node<Node<?>> {
 		if (matcher.matches()) {
 			this.data = node;
 		} else {
-			throw new RuntimeException("varname is error !");
+			throw new RuntimeException("varname is error !" + data);
 		}
 	}
 

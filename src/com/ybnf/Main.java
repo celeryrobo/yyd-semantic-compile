@@ -15,29 +15,40 @@ import com.ybnf.compiler.lucene.TemplateEntity;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
-		List<String> tpls = new LinkedList<>();
-		tpls.add("[[[我] (想 | 要)] 听] $singer 的 (歌 | $song)");
-		tpls.add("[[我] (想 | 要)] 听 [[一] 首] (歌 | $song)");
+		List<String> tplMusic = new LinkedList<>();
+		tplMusic.add("[[[我] (想 | 要)] 听] $singer 的 (歌 | $song)");
+		tplMusic.add("[[我] (想 | 要)] 听 [[一] 首] (歌 | $song)");
+		
+		List<String> tplPoetry = new LinkedList<>();
+		tplPoetry.add("$poetry [的] (下 | 上) [一] 句");
+		tplPoetry.add("背 [诵] [一] 首 ($poetryTitle | ($author 的诗))");
 
-		SemanticService service = new SemanticService("music");
-		initIntent(service, "play", tpls);
-
-		test(service, "听刘德华的冰雨");
+		SemanticService music = new SemanticService("music");
+		SemanticService poetry = new SemanticService("poetry");
+		
+		initIntent(music, "play", tplMusic);
+		initIntent(poetry, "poem", tplPoetry);
+		
+		test(music, "听刘德华的冰雨");
 		long start = System.currentTimeMillis();
-		test(service, "听刘德华的冰雨吧");
-		test(service, "我想听刘德华的冰雨呀");
-		test(service, "我好想听刘德华的冰雨呀");
-		test(service, "我想听歌");
-		test(service, "我想听冰雨");
+		test(music, "听刘德华的冰雨吧");
+		test(music, "我想听刘德华的冰雨呀");
+		test(music, "我好想听刘德华的冰雨呀");
+		test(music, "我想听歌");
+		test(music, "我想听冰雨");
+		
+		test(poetry, "床前明月光的下一句是什么");
+		test(poetry, "床前明月光的上一句呢");
+		test(poetry, "背首李白的诗");
+		test(poetry, "背诵一首静夜诗");
 		System.out.println(System.currentTimeMillis() - start);
 	}
 
 	private static void initIntent(SemanticService service, String name, List<String> tpls) throws Exception {
-		SemanticIntent intent = new SemanticIntent(name);
+		SemanticIntent intent = service.buildIntent(name);
 		for (String tpl : tpls) {
 			intent.addTemplate(tpl);
 		}
-		service.addIntent(intent);
 		System.out.println(service);
 		try (IndexWriterService writerService = new IndexWriterService()) {
 			writerService.initSemanticService(service);
@@ -51,6 +62,7 @@ public class Main {
 		TemplateEntity entity = null;
 		try (IndexReaderService readerService = new IndexReaderService()) {
 			entity = readerService.search(query);
+			System.out.println(entity);
 		}
 		if (entity == null) {
 			System.out.println("fail ...");

@@ -91,11 +91,11 @@ public class SemanticSentence {
 			booleanBuilder.add(phraseBuilder.build(), Occur.MUST);
 		}
 		for (String type : types) {
-			booleanBuilder.add(new TermQuery(new Term(fieldName, type)), Occur.MUST);
+			booleanBuilder.add(new TermQuery(new Term(fieldName, type.toLowerCase())), Occur.MUST);
 		}
 		for (String entType : entTypes) {
 			if (!types.contains(entType)) {
-				booleanBuilder.add(new TermQuery(new Term(fieldName, entType)), Occur.MUST_NOT);
+				booleanBuilder.add(new TermQuery(new Term(fieldName, entType.toLowerCase())), Occur.MUST_NOT);
 			}
 		}
 		return booleanBuilder.build();

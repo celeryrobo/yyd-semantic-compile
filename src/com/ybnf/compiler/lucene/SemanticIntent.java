@@ -16,17 +16,20 @@ public class SemanticIntent {
 	private List<Template> templates;
 	private Forest forest;
 
-	public SemanticIntent(String name) {
+	public SemanticIntent(String service, String name) {
 		this.name = name;
 		this.templates = new LinkedList<>();
 		this.entTypes = new HashSet<>();
-		this.forest = DicLibrary.get();
+		this.forest = DicLibrary.get(service);
+		if(this.forest == null) {
+			this.forest = DicLibrary.get();
+		}
 	}
 
 	public String getName() {
 		return name;
 	}
-
+	
 	public Set<String> getEntTypes() {
 		return entTypes;
 	}
@@ -40,9 +43,13 @@ public class SemanticIntent {
 	}
 
 	public void addTemplate(String bnfTpl) {
-		TemplateBuilder builder = ParserUtils.parse(bnfTpl);
-		for (Template template : builder.build()) {
-			addTemplate(template);
+		try {
+			TemplateBuilder builder = ParserUtils.parse(bnfTpl);
+			for (Template template : builder.build()) {
+				addTemplate(template);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
