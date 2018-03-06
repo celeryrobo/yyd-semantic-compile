@@ -1,4 +1,4 @@
-package com.ybnf.compiler.lucene.tools;
+package com.ybnf.compiler.lucene.parsers;
 
 import java.util.LinkedList;
 import java.util.List;

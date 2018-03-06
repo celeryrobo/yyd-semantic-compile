@@ -1,4 +1,4 @@
-package com.ybnf.compiler.lucene.tools;
+package com.ybnf.compiler.lucene.parsers;
 
 import com.ybnf.compiler.lucene.TemplateBuilder;
 

@@ -5,6 +5,8 @@ import com.ybnf.compiler.beans.YbnfCompileResult;
 import com.ybnf.semantic.SemanticCallable;
 
 public class LuceneCompiler implements ICompiler {
+	public LuceneCompiler(){
+	}
 
 	@Override
 	public YbnfCompileResult compile(String text) throws Exception {

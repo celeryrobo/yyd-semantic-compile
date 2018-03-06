@@ -3,13 +3,13 @@ package com.ybnf.compiler.lucene;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
-import com.ybnf.compiler.lucene.tools.Choices;
-import com.ybnf.compiler.lucene.tools.Group;
-import com.ybnf.compiler.lucene.tools.Node;
-import com.ybnf.compiler.lucene.tools.Or;
-import com.ybnf.compiler.lucene.tools.Sent;
-import com.ybnf.compiler.lucene.tools.Text;
-import com.ybnf.compiler.lucene.tools.Varname;
+import com.ybnf.compiler.lucene.parsers.Choices;
+import com.ybnf.compiler.lucene.parsers.Group;
+import com.ybnf.compiler.lucene.parsers.Node;
+import com.ybnf.compiler.lucene.parsers.Or;
+import com.ybnf.compiler.lucene.parsers.Sent;
+import com.ybnf.compiler.lucene.parsers.Text;
+import com.ybnf.compiler.lucene.parsers.Varname;
 
 public class ParserUtils {
 	private static final Text CHOICES_LEFT = new Text("[");
