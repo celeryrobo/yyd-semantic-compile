@@ -18,7 +18,7 @@ public class ParserUtils {
 	private static final Text GROUP_RIGHT = new Text(")");
 
 	public static TemplateBuilder parse(String lang) throws Exception {
-		String grammar = lang.replaceAll("\\s+", " ");
+		String grammar = lang.replaceAll("\\s+", " ").trim();
 		StringTokenizer tokenizer = new StringTokenizer(grammar, "$[]()| ", true);
 		Stack<Node<?>> stack = new Stack<>();
 		while (tokenizer.hasMoreTokens()) {
