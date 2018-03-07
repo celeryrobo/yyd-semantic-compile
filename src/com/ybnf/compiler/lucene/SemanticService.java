@@ -27,7 +27,7 @@ public class SemanticService {
 		if(intents.containsKey(intentName)) {
 			intent = intents.get(intentName);
 		}else {
-			intent = new SemanticIntent(name, intentName);
+			intent = new SemanticIntent(intentName);
 			intents.put(intentName, intent);
 		}
 		return intent;

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.ansj.domain.Result;
+import org.ansj.library.DicLibrary;
 import org.ansj.splitWord.analysis.DicAnalysis;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
@@ -13,6 +14,7 @@ import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.nlpcn.commons.lang.tire.domain.Forest;
 import org.nlpcn.commons.lang.util.StringUtil;
 
 import com.ybnf.compiler.ICompiler;
@@ -33,11 +35,18 @@ public class SemanticSentence {
 		this.types = new HashSet<>();
 		this.keywords = new LinkedList<>();
 		this.sentences = new LinkedList<>();
-		initSentence(lang);
+		System.out.println(entTypes);
+		Forest[] forests = new Forest[entTypes.size() + 1];
+		forests[0] = DicLibrary.get();
+		Forest[] dics = DicLibrary.gets(this.entTypes);
+		for (int i = 1; i < forests.length; i++) {
+			forests[i] = dics[i - 1];
+		}
+		initSentence(lang, forests);
 	}
 
-	private void initSentence(String lang) {
-		Result result = DicAnalysis.parse(lang);
+	private void initSentence(String lang, Forest... forests) {
+		Result result = DicAnalysis.parse(lang, forests);
 		System.out.println(result);
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
@@ -117,11 +126,13 @@ public class SemanticSentence {
 		YbnfCompileResult result = null;
 		for (String sent : getSentences()) {
 			try {
+				System.out.println(sent);
 				result = compiler.compile(sent);
 				if (result != null) {
 					break;
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		return result;

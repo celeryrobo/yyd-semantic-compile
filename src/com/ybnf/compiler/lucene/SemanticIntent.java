@@ -16,14 +16,11 @@ public class SemanticIntent {
 	private List<Template> templates;
 	private Forest forest;
 
-	public SemanticIntent(String service, String name) {
+	SemanticIntent(String name) {
 		this.name = name;
 		this.templates = new LinkedList<>();
 		this.entTypes = new HashSet<>();
-		this.forest = DicLibrary.get(service);
-		if(this.forest == null) {
-			this.forest = DicLibrary.get();
-		}
+		this.forest = DicLibrary.get();
 	}
 
 	public String getName() {

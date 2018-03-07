@@ -51,6 +51,7 @@ public class LuceneCompiler implements ICompiler {
 	public YbnfCompileResult compile(String text) throws Exception {
 		SemanticSentence sentence = semanticService.buildSentence(text);
 		Query query = sentence.buildQuery("template");
+		System.out.println(query);
 		TemplateEntity entity = null;
 		try (IndexReaderService readerService = new IndexReaderService()) {
 			entity = readerService.search(query);

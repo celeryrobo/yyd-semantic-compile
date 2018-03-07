@@ -22,6 +22,10 @@ public class MITIECompiler implements ICompiler {
 	private TextCategorizer textCategorizer = null;
 	private NamedEntityExtractor namedEntityExtractor = null;
 	private StringVector possibleTags;
+	
+	public MITIECompiler(String categoryFilename, String featureExtractorFilename) {
+		this(categoryFilename, null, featureExtractorFilename);
+	}
 
 	public MITIECompiler(String categoryFilename, String namedEntityFilename, String featureExtractorFilename) {
 		if (totalWordFeatureExtractor == null) {
@@ -79,15 +83,23 @@ public class MITIECompiler implements ICompiler {
 	public YbnfCompileResult compile(String text) throws Exception {
 		SDPair pair = categorizer(text);
 		String[] si = pair.getFirst().split(":", 2);
-		if (si.length != 2) {
+		String service = "";
+		String intent = null;
+		if (si.length > 1) {
+			service = si[0];
+			intent = si[1];
+		} else if (si.length == 1) {
+			service = si[0];
+		} else {
 			throw new Exception("MITIE Service and Intent is error!");
 		}
-		String service = si[0];
 		if (0.3d > pair.getSecond()) {
 			throw new Exception("MITIE Service match fail! (" + service + "'s score is less than 0.3)");
 		}
 		Map<String, String> slots = new HashMap<>();
-		slots.put("intent", si[1]);
+		if (intent != null) {
+			slots.put("intent", intent);
+		}
 		Map<String, String> objects = namedEntityExtractor(text);
 		return new YbnfCompileResult(text, "0.1", "UTF-8", service, objects, slots);
 	}
