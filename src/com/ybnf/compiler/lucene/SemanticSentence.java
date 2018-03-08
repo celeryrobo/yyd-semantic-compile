@@ -107,6 +107,7 @@ public class SemanticSentence {
 				booleanBuilder.add(new TermQuery(new Term(fieldName, entType.toLowerCase())), Occur.MUST_NOT);
 			}
 		}
+		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
 		return booleanBuilder.build();
 	}
 
