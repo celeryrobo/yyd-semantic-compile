@@ -56,9 +56,10 @@ public class LuceneCompiler implements ICompiler {
 		try (IndexReaderService readerService = new IndexReaderService()) {
 			entity = readerService.search(query);
 		}
+		System.out.println("TemplateEntity : " + entity);
 		YbnfCompileResult result = null;
 		if (entity != null) {
-			result = sentence.intent(entity.getIntent()).compile(entity.getTemplate());
+			result = sentence.compile(entity);
 		}
 		return result;
 	}

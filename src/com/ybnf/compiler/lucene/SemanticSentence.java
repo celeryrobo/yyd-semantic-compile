@@ -1,9 +1,11 @@
 package com.ybnf.compiler.lucene;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.ansj.domain.Result;
 import org.ansj.library.DicLibrary;
@@ -34,8 +36,7 @@ public class SemanticSentence {
 		this.entTypes = entTypes;
 		this.types = new HashSet<>();
 		this.keywords = new LinkedList<>();
-		this.sentences = new LinkedList<>();
-		System.out.println(entTypes);
+		this.sentences = new ArrayList<>();
 		Forest[] forests = new Forest[entTypes.size() + 1];
 		forests[0] = DicLibrary.get();
 		Forest[] dics = DicLibrary.gets(this.entTypes);
@@ -74,18 +75,23 @@ public class SemanticSentence {
 		return keywords;
 	}
 
-	public List<String> getSentences() {
-		List<String> sents = new LinkedList<>();
-		int size = sentences.size();
-		for (int i = 0; i < size; i++) {
-			StringBuilder sb = new StringBuilder();
-			for (int j = i; j < size; j++) {
-				sb.append(sentences.get(j));
+	private String getSentence(String template) {
+		StringTokenizer tokenizer = new StringTokenizer(template, " ");
+		int index = 0, kvIndex = 0;
+		while (tokenizer.hasMoreTokens()) {
+			String token = tokenizer.nextToken();
+			if (token.startsWith("$")) {
+				kvIndex++;
+				continue;
 			}
-			sents.add(sb.toString());
+			index = sentences.indexOf(token);
+			break;
 		}
-		System.out.println("--->>>:" + sents);
-		return sents;
+		StringBuilder builder = new StringBuilder();
+		for (int i = index - kvIndex; i < sentences.size(); i++) {
+			builder.append(sentences.get(i));
+		}
+		return builder.toString();
 	}
 
 	public Query buildQuery(String fieldName) {
@@ -100,42 +106,38 @@ public class SemanticSentence {
 			booleanBuilder.add(phraseBuilder.build(), Occur.MUST);
 		}
 		for (String type : types) {
-			booleanBuilder.add(new TermQuery(new Term(fieldName, type.toLowerCase())), Occur.MUST);
-		}
-		for (String entType : entTypes) {
-			if (!types.contains(entType)) {
-				booleanBuilder.add(new TermQuery(new Term(fieldName, entType.toLowerCase())), Occur.MUST_NOT);
-			}
+			booleanBuilder.add(new TermQuery(new Term(fieldName, type.toLowerCase())), Occur.SHOULD);
 		}
 		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
 		return booleanBuilder.build();
 	}
 
 	public YbnfCompileResult compile(String template) throws Exception {
+		Set<String> _types = new HashSet<>();
+		StringTokenizer tokenizer = new StringTokenizer(template, " ");
+		while (tokenizer.hasMoreTokens()) {
+			String token = tokenizer.nextToken();
+			if (token.startsWith("$")) {
+				_types.add(token.substring(1));
+			}
+		}
 		StringBuilder sb = new StringBuilder("#YBNF 1.0 utf8;");
-		sb.append("service ").append(service).append(";root $main;");
-		sb.append("$main");
+		sb.append("service ").append(service).append(";root $main;").append("$main");
 		if (!intent.isEmpty()) {
 			sb.append("{intent%").append(intent).append("}");
 		}
 		sb.append(" = ").append(template).append(";");
 		String entities = StringUtil.joiner(sentences, "|");
-		for (String type : types) {
+		for (String type : _types) {
 			sb.append("$").append(type).append("{").append(type).append("} = ").append(entities).append(";");
 		}
 		ICompiler compiler = new JCompiler(sb.toString());
-		YbnfCompileResult result = null;
-		for (String sent : getSentences()) {
-			try {
-				System.out.println(sent);
-				result = compiler.compile(sent);
-				if (result != null) {
-					break;
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return result;
+		String sent = getSentence(template);
+		System.out.println("Sentence : " + sent);
+		return compiler.compile(sent);
+	}
+
+	public YbnfCompileResult compile(TemplateEntity templateEntity) throws Exception {
+		return intent(templateEntity.getIntent()).compile(templateEntity.getTemplate());
 	}
 }
