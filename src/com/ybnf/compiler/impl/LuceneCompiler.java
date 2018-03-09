@@ -38,16 +38,20 @@ public class LuceneCompiler implements ICompiler {
 			}
 		}
 	}
-	
+
 	public LuceneCompiler(String service) throws Exception {
 		semanticService = SERVICES.get(service);
 		if (semanticService == null) {
 			throw new Exception("场景:" + service + "，不存在！");
 		}
 	}
-	
+
 	public LuceneCompiler(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
-		init(sceneIntentTemplates);
+		if (sceneIntentTemplates != null) {
+			synchronized (SERVICES) {
+				init(sceneIntentTemplates);
+			}
+		}
 	}
 
 	@Override
