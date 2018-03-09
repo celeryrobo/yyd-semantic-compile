@@ -52,14 +52,17 @@ public class LuceneCompiler implements ICompiler {
 		SemanticSentence sentence = semanticService.buildSentence(text);
 		Query query = sentence.buildQuery("template");
 		System.out.println(query);
-		TemplateEntity entity = null;
+		List<TemplateEntity> entities = null;
 		try (IndexReaderService readerService = new IndexReaderService()) {
-			entity = readerService.search(query);
+			entities = readerService.search(query);
 		}
-		System.out.println("TemplateEntity : " + entity);
+		System.out.println("TemplateEntity : ");
+		for (TemplateEntity entity : entities) {
+			System.out.println(entity);
+		}
 		YbnfCompileResult result = null;
-		if (entity != null) {
-			result = sentence.compile(entity);
+		if (entities != null) {
+			result = sentence.compile(entities);
 		}
 		return result;
 	}

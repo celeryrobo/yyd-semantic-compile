@@ -1,5 +1,8 @@
 package com.ybnf.compiler.lucene;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -17,15 +20,19 @@ public class IndexReaderService extends LuceneService {
 		searcher = new IndexSearcher(reader);
 	}
 
-	public TemplateEntity search(Query query) throws Exception {
+	public List<TemplateEntity> search(Query query) throws Exception {
 		TopDocs docs = searcher.search(query, 10);
 		System.out.println("total hits : " + docs.totalHits);
 		if (docs.totalHits == 0) {
 			return null;
 		}
-		return buildTemplateEntity(docs.scoreDocs[0]);
+		List<TemplateEntity> entities = new LinkedList<>();
+		for (ScoreDoc scoreDoc : docs.scoreDocs) {
+			entities.add(buildTemplateEntity(scoreDoc));
+		}
+		return entities;
 	}
-	
+
 	private TemplateEntity buildTemplateEntity(ScoreDoc scoreDoc) throws Exception {
 		Document doc = searcher.doc(scoreDoc.doc);
 		String service = doc.get("service");

@@ -113,6 +113,7 @@ public class SemanticSentence {
 	}
 
 	public YbnfCompileResult compile(String template) throws Exception {
+		// 获取模板中的变量
 		Set<String> _types = new HashSet<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
 		while (tokenizer.hasMoreTokens()) {
@@ -121,6 +122,7 @@ public class SemanticSentence {
 				_types.add(token.substring(1));
 			}
 		}
+		// 根据模板与变量构建YBNF语法
 		StringBuilder sb = new StringBuilder("#YBNF 1.0 utf8;");
 		sb.append("service ").append(service).append(";root $main;").append("$main");
 		if (!intent.isEmpty()) {
@@ -131,6 +133,7 @@ public class SemanticSentence {
 		for (String type : _types) {
 			sb.append("$").append(type).append("{").append(type).append("} = ").append(entities).append(";");
 		}
+		// 使用构建好了的YBNF语法编译当前语料
 		ICompiler compiler = new JCompiler(sb.toString());
 		String sent = getSentence(template);
 		System.out.println("Sentence : " + sent);
@@ -139,5 +142,17 @@ public class SemanticSentence {
 
 	public YbnfCompileResult compile(TemplateEntity templateEntity) throws Exception {
 		return intent(templateEntity.getIntent()).compile(templateEntity.getTemplate());
+	}
+
+	public YbnfCompileResult compile(List<TemplateEntity> templateEntities) throws Exception {
+		Exception ex = null;
+		for (TemplateEntity templateEntity : templateEntities) {
+			try {
+				return compile(templateEntity);
+			} catch (Exception e) {
+				ex = e;
+			}
+		}
+		throw new Exception(ex);
 	}
 }
