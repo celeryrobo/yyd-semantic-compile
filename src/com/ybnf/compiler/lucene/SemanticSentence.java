@@ -145,14 +145,14 @@ public class SemanticSentence {
 	}
 
 	public YbnfCompileResult compile(List<TemplateEntity> templateEntities) throws Exception {
-		Exception ex = null;
+		StringBuilder sb = new StringBuilder();
 		for (TemplateEntity templateEntity : templateEntities) {
 			try {
 				return compile(templateEntity);
 			} catch (Exception e) {
-				ex = e;
+				sb.append(e).append("\n");
 			}
 		}
-		throw new Exception(ex);
+		throw new Exception(sb.toString());
 	}
 }

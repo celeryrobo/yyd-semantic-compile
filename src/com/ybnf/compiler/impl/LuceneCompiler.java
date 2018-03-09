@@ -21,7 +21,7 @@ public class LuceneCompiler implements ICompiler {
 	private static Map<String, SemanticService> SERVICES = new HashMap<>();
 	private SemanticService semanticService = null;
 
-	public LuceneCompiler(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
+	private static void init(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
 		try (IndexWriterService writerService = new IndexWriterService()) {
 			for (Entry<String, Map<String, List<String>>> sceneIntentTemplate : sceneIntentTemplates.entrySet()) {
 				String sceneName = sceneIntentTemplate.getKey();
@@ -38,13 +38,16 @@ public class LuceneCompiler implements ICompiler {
 			}
 		}
 	}
-
-	public LuceneCompiler service(String service) throws Exception {
+	
+	public LuceneCompiler(String service) throws Exception {
 		semanticService = SERVICES.get(service);
 		if (semanticService == null) {
 			throw new Exception("场景:" + service + "，不存在！");
 		}
-		return this;
+	}
+	
+	public LuceneCompiler(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
+		init(sceneIntentTemplates);
 	}
 
 	@Override
