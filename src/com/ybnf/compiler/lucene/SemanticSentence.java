@@ -1,11 +1,9 @@
 package com.ybnf.compiler.lucene;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -21,8 +19,32 @@ import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.nlpcn.commons.lang.tire.domain.Forest;
+import org.nlpcn.commons.lang.util.StringUtil;
 
 import com.ybnf.compiler.beans.YbnfCompileResult;
+import com.ybnf.compiler.impl.JCompiler;
+
+class Sentence {
+	private String lang;
+	private List<String> keywords;
+
+	public Sentence(String lang, List<String> keywords) {
+		this.lang = lang;
+		this.keywords = keywords;
+	}
+
+	public Sentence(String lang) {
+		this(lang, new LinkedList<>());
+	}
+
+	public String getLang() {
+		return lang;
+	}
+
+	public List<String> getKeywords() {
+		return keywords;
+	}
+}
 
 public class SemanticSentence {
 	private String intent = "";
@@ -78,33 +100,29 @@ public class SemanticSentence {
 		return keywords;
 	}
 
-	private Map<String, String> buildSentence(String text, String template) throws Exception {
+	private Sentence buildSentence(String text, String template) throws Exception {
 		StringBuilder regexBuilder = new StringBuilder();
-		Set<String> varNames = new HashSet<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (token.startsWith("$")) {
-				String varName = token.substring(1);
-				regexBuilder.append("(?<").append(varName).append(">.+)");
-				varNames.add(varName);
+				regexBuilder.append("(.+)");
 			} else {
 				regexBuilder.append(token);
 			}
 		}
-		System.out.println(regexBuilder);
+		System.out.println("Regex : " + regexBuilder);
 		Pattern pattern = Pattern.compile(regexBuilder.toString());
 		Matcher matcher = pattern.matcher(text);
-		Map<String, String> result = new HashMap<>();
 		if (matcher.find()) {
-			for (String varName : varNames) {
-				result.put(varName, matcher.group(varName));
-				System.out.println(varName + ":" + result.get(varName));
+			String sent = matcher.group();
+			Sentence sentence = new Sentence(sent);
+			for (int i = 0; i < matcher.groupCount(); i++) {
+				sentence.getKeywords().add(matcher.group(i + 1));
 			}
-		} else {
-			throw new Exception("Semantic Match Failture !");
+			return sentence;
 		}
-		return result;
+		throw new Exception("Semantic Match Failture !");
 	}
 
 	public Query buildQuery(String fieldName) {
@@ -126,12 +144,33 @@ public class SemanticSentence {
 	}
 
 	public YbnfCompileResult compile(String template) throws Exception {
-		String text = lang;// StringUtil.joiner(sentences, "");
-		System.out.println(text);
-		Map<String, String> objects = buildSentence(text, template);
-		Map<String, String> slots = new HashMap<>();
-		slots.put("intent", intent);
-		return new YbnfCompileResult(text, "0.1", "UTF8", service, objects, slots);
+		// 获取模板中的变量
+		Set<String> _types = new HashSet<>();
+		StringTokenizer tokenizer = new StringTokenizer(template, " ");
+		while (tokenizer.hasMoreTokens()) {
+			String token = tokenizer.nextToken();
+			if (token.startsWith("$")) {
+				_types.add(token.substring(1));
+			}
+		}
+		// 根据模板与变量构建YBNF语法
+		StringBuilder sb = new StringBuilder("#YBNF 1.0 utf8;");
+		sb.append("service ").append(service).append(";root $main;").append("$main");
+		if (!intent.isEmpty()) {
+			sb.append("{intent%").append(intent).append("}");
+		}
+		sb.append(" = ").append(template).append(";");
+		Sentence sent = buildSentence(lang, template);
+		Set<String> sents = new HashSet<>();
+		sents.addAll(sentences);
+		sents.addAll(sent.getKeywords());
+		String entities = StringUtil.joiner(sents, "|");
+		for (String type : _types) {
+			sb.append("$").append(type).append("{").append(type).append("} = ").append(entities).append(";");
+		}
+		System.out.println("Sentence : " + sent.getLang());
+		// 使用构建好了的YBNF语法编译当前语料
+		return new JCompiler(sb.toString()).compile(sent.getLang());
 	}
 
 	public YbnfCompileResult compile(TemplateEntity templateEntity) throws Exception {
