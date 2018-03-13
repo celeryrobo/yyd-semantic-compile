@@ -33,4 +33,17 @@ public interface SemanticContext {
 	 */
 	Map<Object, Object> getParams();
 
+	/**
+	 * 设置当前会话的本地零时变量
+	 * 
+	 * @param localVar
+	 */
+	void setLocalVar(Object localVar);
+
+	/**
+	 * 获取当前会话的本地零时变量
+	 * 
+	 * @return
+	 */
+	Object getLocalVar();
 }
