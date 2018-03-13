@@ -34,6 +34,13 @@ public interface SemanticContext {
 	Map<Object, Object> getParams();
 
 	/**
+	 * 获取当前用户的属性
+	 * 
+	 * @return 语义实体字典
+	 */
+	Map<Object, Object> getAttrs();
+
+	/**
 	 * 设置当前会话的本地零时变量
 	 * 
 	 * @param localVar
