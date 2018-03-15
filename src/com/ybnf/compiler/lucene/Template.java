@@ -45,4 +45,18 @@ public class Template {
 		sb.append("}");
 		return sb.toString();
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Template) {
+			Template tpl = (Template) obj;
+			return template.equals(tpl.template);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return template.hashCode();
+	}
 }

@@ -1,8 +1,6 @@
 package com.ybnf.compiler.lucene;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.ansj.library.DicLibrary;
@@ -13,7 +11,7 @@ import org.nlpcn.commons.lang.tire.library.Library;
 public class SemanticIntent {
 	private String name;
 	private Set<String> entTypes;
-	private List<Template> templates;
+	private Set<Template> templates;
 	private Forest forest;
 
 	SemanticIntent(String name) {
@@ -50,12 +48,12 @@ public class SemanticIntent {
 		}
 	}
 
-	public List<Template> getTemplates() {
+	public Set<Template> getTemplates() {
 		return templates;
 	}
 	
 	public void resetTemplates() {
-		templates = new LinkedList<>();
+		templates = new HashSet<>();
 	}
 
 	@Override
