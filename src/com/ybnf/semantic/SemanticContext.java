@@ -50,7 +50,14 @@ public interface SemanticContext {
 	/**
 	 * 获取当前会话的本地零时变量
 	 * 
-	 * @return
+	 * @return Object
 	 */
 	Object getLocalVar();
+
+	/**
+	 * 获取当前会话的用户标识
+	 * 
+	 * @return String
+	 */
+	String getUserIdentify();
 }
