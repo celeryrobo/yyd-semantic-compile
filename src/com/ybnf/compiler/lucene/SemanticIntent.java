@@ -18,9 +18,9 @@ public class SemanticIntent {
 
 	SemanticIntent(String name) {
 		this.name = name;
-		this.templates = new LinkedList<>();
 		this.entTypes = new HashSet<>();
 		this.forest = DicLibrary.get();
+		resetTemplates();
 	}
 
 	public String getName() {
@@ -52,6 +52,10 @@ public class SemanticIntent {
 
 	public List<Template> getTemplates() {
 		return templates;
+	}
+	
+	public void resetTemplates() {
+		templates = new LinkedList<>();
 	}
 
 	@Override

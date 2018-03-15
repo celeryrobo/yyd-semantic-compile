@@ -37,6 +37,7 @@ public class IndexWriterService extends LuceneService {
 			for (Template template : entry.getValue().getTemplates()) {
 				addTemplateEntity(new TemplateEntity(serviceName, intentName, template.getTemplate()));
 			}
+			entry.getValue().resetTemplates();
 		}
 	}
 
