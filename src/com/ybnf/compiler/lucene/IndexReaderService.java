@@ -2,6 +2,7 @@ package com.ybnf.compiler.lucene;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -12,6 +13,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
 public class IndexReaderService extends LuceneService {
+	private static final Logger LOG = Logger.getLogger(IndexReaderService.class.getSimpleName());
 	private IndexReader reader;
 	private IndexSearcher searcher;
 
@@ -22,7 +24,7 @@ public class IndexReaderService extends LuceneService {
 
 	public List<TemplateEntity> search(Query query) throws Exception {
 		TopDocs docs = searcher.search(query, 10);
-		System.out.println("total hits : " + docs.totalHits);
+		LOG.info("total hits : " + docs.totalHits);
 		if (docs.totalHits == 0) {
 			return null;
 		}

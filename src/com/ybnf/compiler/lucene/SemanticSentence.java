@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +27,7 @@ import org.nlpcn.commons.lang.util.StringUtil;
 import com.ybnf.compiler.beans.YbnfCompileResult;
 
 public class SemanticSentence {
+	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
 	private String intent = "";
 	private String lang;
 	private String service;
@@ -52,7 +54,7 @@ public class SemanticSentence {
 
 	private void initSentence(String lang, Forest... forests) {
 		Result result = DicAnalysis.parse(lang, forests);
-		System.out.println(result);
+		LOG.info(result.toString());
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
@@ -94,7 +96,7 @@ public class SemanticSentence {
 				regexBuilder.append(token);
 			}
 		}
-		System.out.println("Regex : " + regexBuilder);
+		LOG.info("Regex : " + regexBuilder);
 		Pattern pattern = Pattern.compile(regexBuilder.toString());
 		Matcher matcher = pattern.matcher(text);
 		if (matcher.find()) {

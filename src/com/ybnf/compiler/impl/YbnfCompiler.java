@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import com.ybnf.compiler.Compiler;
 import com.ybnf.compiler.Include;
@@ -16,6 +17,7 @@ import clojure.lang.RT;
 import clojure.lang.Var;
 
 public class YbnfCompiler extends Compiler {
+	private static final Logger LOG = Logger.getLogger(YbnfCompiler.class.getSimpleName());
 	private String classRootPath;
 	private List<Compiler> compilers;
 	private SemanticCallable semanticCallable;
@@ -150,8 +152,8 @@ public class YbnfCompiler extends Compiler {
 		}
 		try {
 			result = new YbnfCompiler("#YBNF 0.1 utf8;" + sb.toString()).getGrammar();
-			System.out.println("======================================================");
-			System.out.println(result);
+			LOG.info("======================================================");
+			LOG.info(result);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

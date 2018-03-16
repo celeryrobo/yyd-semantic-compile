@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import org.apache.lucene.search.Query;
 
@@ -18,6 +19,7 @@ import com.ybnf.compiler.lucene.TemplateEntity;
 import com.ybnf.semantic.SemanticCallable;
 
 public class LuceneCompiler implements ICompiler {
+	private static final Logger LOG = Logger.getLogger(LuceneCompiler.class.getSimpleName());
 	private static Map<String, SemanticService> SERVICES = new HashMap<>();
 	private SemanticService semanticService = null;
 
@@ -58,14 +60,14 @@ public class LuceneCompiler implements ICompiler {
 	public YbnfCompileResult compile(String text) throws Exception {
 		SemanticSentence sentence = semanticService.buildSentence(text);
 		Query query = sentence.buildQuery("template");
-		System.out.println(query);
+		LOG.info(query.toString());
 		List<TemplateEntity> entities = null;
 		try (IndexReaderService readerService = new IndexReaderService()) {
 			entities = readerService.search(query);
 		}
-		System.out.println("TemplateEntity : ");
+		LOG.info("TemplateEntity : ");
 		for (TemplateEntity entity : entities) {
-			System.out.println(entity);
+			LOG.info(entity.toString());
 		}
 		YbnfCompileResult result = null;
 		if (entities != null) {
