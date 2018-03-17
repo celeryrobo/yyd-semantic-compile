@@ -23,12 +23,15 @@ public class IndexReaderService extends LuceneService {
 	}
 
 	public List<TemplateEntity> search(Query query) throws Exception {
+		List<TemplateEntity> entities = new LinkedList<>();
+		if (query == null) {
+			return entities;
+		}
 		TopDocs docs = searcher.search(query, 10);
 		LOG.info("total hits : " + docs.totalHits);
 		if (docs.totalHits == 0) {
 			return null;
 		}
-		List<TemplateEntity> entities = new LinkedList<>();
 		for (ScoreDoc scoreDoc : docs.scoreDocs) {
 			entities.add(buildTemplateEntity(scoreDoc));
 		}

@@ -123,6 +123,9 @@ public class SemanticSentence {
 		for (String type : types) {
 			booleanBuilder.add(new TermQuery(new Term(fieldName, type.toLowerCase())), Occur.SHOULD);
 		}
+		if (keywords.isEmpty() && types.isEmpty()) {
+			return null;
+		}
 		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
 		return booleanBuilder.build();
 	}
