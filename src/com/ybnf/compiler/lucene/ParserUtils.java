@@ -97,8 +97,10 @@ public class ParserUtils {
 	}
 
 	public static float distanceScore(String sourceStr, String targetStr) {
-		int rowSize = sourceStr.length() + 1;
-		int colSize = targetStr.length() + 1;
+		int sourceLen = sourceStr.length();
+		int targetLen = targetStr.length();
+		int rowSize = sourceLen + 1;
+		int colSize = targetLen + 1;
 		int[][] vecs = new int[rowSize][colSize];
 		for (int col = 0; col < colSize; col++) {
 			vecs[0][col] = col;
@@ -121,7 +123,7 @@ public class ParserUtils {
 						Math.min(vecs[row][col - 1] + 1, vecs[row - 1][col] + 1));
 			}
 		}
-		int distance = vecs[rowSize - 1][colSize - 1];
-		return 1 - (float) distance / Math.max(rowSize - 1, colSize - 1);
+		int distance = vecs[sourceLen][targetLen];
+		return 1 - (float) distance / Math.max(sourceLen, targetLen);
 	}
 }
