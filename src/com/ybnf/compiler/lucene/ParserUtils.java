@@ -95,4 +95,33 @@ public class ParserUtils {
 			return new Text(token);
 		}
 	}
+
+	public static float distanceScore(String sourceStr, String targetStr) {
+		int rowSize = sourceStr.length() + 1;
+		int colSize = targetStr.length() + 1;
+		int[][] vecs = new int[rowSize][colSize];
+		for (int col = 0; col < colSize; col++) {
+			vecs[0][col] = col;
+		}
+		for (int row = 0; row < rowSize; row++) {
+			vecs[row][0] = row;
+		}
+		char source, target;
+		int temp;
+		for (int row = 1; row < rowSize; row++) {
+			source = sourceStr.charAt(row - 1);
+			for (int col = 1; col < colSize; col++) {
+				target = targetStr.charAt(col - 1);
+				if (source == target) {
+					temp = 0;
+				} else {
+					temp = 1;
+				}
+				vecs[row][col] = Math.min(temp + vecs[row - 1][col - 1],
+						Math.min(vecs[row][col - 1] + 1, vecs[row - 1][col] + 1));
+			}
+		}
+		int distance = vecs[rowSize - 1][colSize - 1];
+		return 1 - (float) distance / Math.max(rowSize - 1, colSize - 1);
+	}
 }

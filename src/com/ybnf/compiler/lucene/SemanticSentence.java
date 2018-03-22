@@ -100,6 +100,11 @@ public class SemanticSentence {
 		Pattern pattern = Pattern.compile(regexBuilder.toString());
 		Matcher matcher = pattern.matcher(text);
 		if (matcher.find()) {
+			String target = matcher.group();
+			float score = ParserUtils.distanceScore(text, target);
+			if (score < 0.33f) {
+				throw new Exception("Semantic Match Failture (score[" + score + "] less than 0.33) !");
+			}
 			Map<String, String> objects = new HashMap<>();
 			for (String name : names) {
 				objects.put(name, matcher.group(name));
@@ -121,7 +126,9 @@ public class SemanticSentence {
 			booleanBuilder.add(phraseBuilder.build(), Occur.MUST);
 		}
 		for (String type : types) {
-			booleanBuilder.add(new TermQuery(new Term(fieldName, type.toLowerCase())), Occur.SHOULD);
+			if (entTypes.contains(type)) {
+				booleanBuilder.add(new TermQuery(new Term(fieldName, type.toLowerCase())), Occur.SHOULD);
+			}
 		}
 		if (keywords.isEmpty() && types.isEmpty()) {
 			return null;
@@ -144,12 +151,12 @@ public class SemanticSentence {
 	}
 
 	public YbnfCompileResult compile(List<TemplateEntity> templateEntities) throws Exception {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("\n");
 		for (TemplateEntity templateEntity : templateEntities) {
 			try {
 				return compile(templateEntity);
 			} catch (Exception e) {
-				sb.append(e).append("\n");
+				sb.append(templateEntity).append(" : ").append(e).append("\n");
 			}
 		}
 		throw new Exception(sb.toString());
