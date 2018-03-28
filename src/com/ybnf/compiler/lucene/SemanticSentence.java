@@ -14,7 +14,8 @@ import java.util.regex.Pattern;
 
 import org.ansj.domain.Result;
 import org.ansj.library.DicLibrary;
-import org.ansj.splitWord.analysis.DicAnalysis;
+import org.ansj.recognition.impl.UserDicNatureRecognition;
+import org.ansj.splitWord.analysis.IndexAnalysis;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
@@ -53,9 +54,12 @@ public class SemanticSentence {
 	}
 
 	private void initSentence(String lang, Forest... forests) {
-		Result result = DicAnalysis.parse(lang, forests);
+		Result result = IndexAnalysis.parse(lang, forests);
+		new UserDicNatureRecognition(forests).recognition(result);
 		LOG.info(result.toString());
-		for (org.ansj.domain.Term term : result) {
+		List<org.ansj.domain.Term> terms = filterTerms(lang, result);
+		LOG.info(terms.toString());
+		for (org.ansj.domain.Term term : terms) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
 			if ("kv".equals(natureStr)) {
@@ -66,6 +70,20 @@ public class SemanticSentence {
 				sentences.add(name);
 			}
 		}
+	}
+	
+	private List<org.ansj.domain.Term> filterTerms(String lang, Result result){
+		List<org.ansj.domain.Term> terms = new LinkedList<>();
+		int curSize = 0, curIndex = 0;
+		for (org.ansj.domain.Term term : result) {
+			String realName = term.getRealName();
+			curIndex = lang.indexOf(realName, curSize - 1);
+			if(curIndex >= curSize) {
+				curSize += realName.length();
+				terms.add(term);
+			}
+		}
+		return terms;
 	}
 
 	public SemanticSentence intent(String intent) {
