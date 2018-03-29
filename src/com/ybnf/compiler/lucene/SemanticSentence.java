@@ -71,15 +71,16 @@ public class SemanticSentence {
 			}
 		}
 	}
-	
-	private List<org.ansj.domain.Term> filterTerms(String lang, Result result){
+
+	private List<org.ansj.domain.Term> filterTerms(String lang, Result result) {
 		List<org.ansj.domain.Term> terms = new LinkedList<>();
-		int curSize = 0, curIndex = 0;
+		int totalSize = 0, curSize = 0, curIndex = 0;
 		for (org.ansj.domain.Term term : result) {
 			String realName = term.getRealName();
-			curIndex = lang.indexOf(realName, curSize - 1);
-			if(curIndex >= curSize) {
-				curSize += realName.length();
+			curIndex = lang.indexOf(realName, totalSize - curSize - 1);
+			if (curIndex >= totalSize) {
+				curSize = realName.length();
+				totalSize += curSize;
 				terms.add(term);
 			}
 		}
