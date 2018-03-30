@@ -13,9 +13,9 @@ public abstract class AbstractSemanticResult {
 		 */
 		SPEAK,
 		/**
-		 * 机器人移动
+		 * 机器人命令
 		 */
-		MOVE,
+		COMMAND,
 		/**
 		 * 打开第三方APP
 		 */
@@ -28,6 +28,10 @@ public abstract class AbstractSemanticResult {
 		 */
 		T,
 		/**
+		 * 命令
+		 */
+		C,
+		/**
 		 * 资源URL
 		 */
 		U,
@@ -39,6 +43,10 @@ public abstract class AbstractSemanticResult {
 		 * 图片URL+文本
 		 */
 		IT,
+		/**
+		 * 命令+文本
+		 */
+		TC,
 		/**
 		 * 图片URL+资源URL
 		 */
