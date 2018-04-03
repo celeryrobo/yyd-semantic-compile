@@ -14,13 +14,14 @@ import org.nlpcn.commons.lang.tire.library.Library;
 public class Main {
 	private static List<Term> text(String lang, Result r) {
 		List<Term> strs = new LinkedList<>();
-		int curSize = 0, curIndex = 0;
+		int totalSize = 0, curSize = 0, curIndex = 0;
 		for (Term t : r) {
 			String s = t.getRealName();
-			curIndex = lang.indexOf(s, curSize - 1);
-			if(curIndex >= curSize) {
+			curIndex = lang.indexOf(s, totalSize - curSize - 1);
+			if(curIndex >= totalSize) {
 				System.out.println(s);
-				curSize += s.length();
+				curSize = s.length();
+				totalSize += curSize;
 				strs.add(t);
 			}
 		}
@@ -30,16 +31,19 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		Forest forest = new Forest();
 		Library.insertWord(forest, new Value("我想听", "kv", "1"));
+		Library.insertWord(forest, new Value("我想", "kv", "1"));
+		Library.insertWord(forest, new Value("我", "kv", "1"));
 		Library.insertWord(forest, new Value("想听", "kv", "1"));
+		Library.insertWord(forest, new Value("想", "kv", "1"));
 		Library.insertWord(forest, new Value("听", "kv", "1"));
-		Library.insertWord(forest, new Value("的", "kv", "1"));
-		Library.insertWord(forest, new Value("床前明月光", "txt", "1"));
-		Library.insertWord(forest, new Value("明月", "txt", "1"));
-		Library.insertWord(forest, new Value("李白", "txt", "1"));
-		String lang = "我想听李白的床前明月光";
+		Library.insertWord(forest, new Value("我们不一样", "txt", "1"));
+		Library.insertWord(forest, new Value("我们", "txt", "1"));
+		Library.insertWord(forest, new Value("不一样", "txt", "1"));
+		Library.insertWord(forest, new Value("一样", "txt", "1"));
+		String lang = "我想听我们不一样";
 		Result res = IndexAnalysis.parse(lang, forest);
 		new UserDicNatureRecognition(forest).recognition(res);
 		System.out.println(res);
-		System.out.println(text(lang, res));;
+		System.out.println(text(lang, res));
 	}
 }
