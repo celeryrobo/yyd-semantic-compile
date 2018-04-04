@@ -17,16 +17,14 @@ public class SemanticService {
 	public String getName() {
 		return name;
 	}
-	
+
 	public Map<String, SemanticIntent> getIntents() {
 		return intents;
 	}
-	
+
 	public SemanticIntent buildIntent(String intentName) {
-		SemanticIntent intent = null;
-		if(intents.containsKey(intentName)) {
-			intent = intents.get(intentName);
-		}else {
+		SemanticIntent intent = intents.get(intentName);
+		if (intent == null) {
 			intent = new SemanticIntent(intentName);
 			intents.put(intentName, intent);
 		}

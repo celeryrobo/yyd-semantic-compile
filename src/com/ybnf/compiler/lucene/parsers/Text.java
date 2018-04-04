@@ -2,7 +2,6 @@ package com.ybnf.compiler.lucene.parsers;
 
 import com.ybnf.compiler.lucene.TemplateBuilder;
 
-
 public class Text extends Node<String> {
 	public Text(String text) {
 		this.data = text;

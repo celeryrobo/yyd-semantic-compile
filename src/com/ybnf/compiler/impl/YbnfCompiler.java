@@ -26,7 +26,7 @@ public class YbnfCompiler extends Compiler {
 
 	public YbnfCompiler(String ybnf) throws Exception {
 		super(ybnf);
-		if(isFailure()) {
+		if (isFailure()) {
 			throw new Exception(getFailure());
 		}
 	}

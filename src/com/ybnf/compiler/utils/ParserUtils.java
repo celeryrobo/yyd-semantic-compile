@@ -38,7 +38,9 @@ public class ParserUtils {
 		public Object applyTo(ISeq arglist) {
 			YbnfStruct ybnfStruct = new YbnfStruct();
 			for (Struct struct : (Iterable<Struct>) arglist) {
-				struct.getType().parse(ybnfStruct, struct.getValue());
+				if (struct != null) {
+					struct.getType().parse(ybnfStruct, struct.getValue());
+				}
 			}
 			return ybnfStruct;
 		}
@@ -73,8 +75,11 @@ public class ParserUtils {
 		@Override
 		public Object applyTo(ISeq arglist) {
 			CallableStruct callableStruct = new CallableStruct((String) arglist.first());
-			for (Object arg : (Iterable<Object>) arglist.next()) {
-				callableStruct.getArgs().add(arg);
+			ISeq args = arglist.next();
+			if (args != null) {
+				for (Object arg : (Iterable<Object>) args) {
+					callableStruct.getArgs().add(arg);
+				}
 			}
 			return callableStruct;
 		}
@@ -195,6 +200,9 @@ public class ParserUtils {
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object applyTo(ISeq arglist) {
+			if (arglist == null) {
+				return null;
+			}
 			BodyStruct bs = new BodyStruct();
 			StringBuilder sb = new StringBuilder();
 			for (DefineStruct defineStruct : (Iterable<DefineStruct>) arglist) {

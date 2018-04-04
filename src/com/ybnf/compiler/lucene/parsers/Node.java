@@ -6,7 +6,7 @@ public abstract class Node<T> {
 	protected T data;
 
 	public abstract TemplateBuilder build();
-	
+
 	public T getData() {
 		return data;
 	}

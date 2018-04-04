@@ -32,16 +32,16 @@ public class CompilerUtils {
 	private final static IFn TRANSFORM = RT.var(INSTAPARSE_CORE, "transform");
 	private final static IFn GET_FAILURE = RT.var(INSTAPARSE_CORE, "get-failure");
 	private final static IFn IS_FAILURE = RT.var(INSTAPARSE_CORE, "failure?");
-	
+
 	static {
 		require("instaparse.core");
 		require("clojure.pprint");
 	}
-	
+
 	public static Object require(String ns) {
 		return REQUIRE.invoke(RT.readString(ns));
 	}
-	
+
 	public static Keyword keyword(String name) {
 		return (Keyword) KEYWORD.invoke(name);
 	}
@@ -145,11 +145,11 @@ public class CompilerUtils {
 	public static String readFile(File file) throws Exception {
 		return readFile(fileReader(file));
 	}
-	
+
 	public static String readFile(InputStream inputStream) throws Exception {
 		return readFile(fileReader(inputStream));
 	}
-	
+
 	public static String readFile(BufferedReader bufferedReader) throws Exception {
 		StringBuilder sb = new StringBuilder();
 		String line;

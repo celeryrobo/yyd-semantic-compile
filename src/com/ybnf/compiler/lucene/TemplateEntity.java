@@ -22,7 +22,7 @@ public class TemplateEntity {
 	public String getTemplate() {
 		return template;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder("{");

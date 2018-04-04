@@ -13,11 +13,11 @@ public abstract class Compiler extends compiler implements ICompiler {
 	private String version = null;
 	private String charset = null;
 	private Map<String, ArrayList<String>> header = null;
-	
+
 	@SuppressWarnings("unchecked")
 	public Compiler(String ybnf) throws Exception {
 		super(ybnf);
-		if(isFailure()) {
+		if (isFailure()) {
 			throw new Exception(getFailure());
 		}
 		header = (Map<String, ArrayList<String>>) this.getHeader();
@@ -47,7 +47,7 @@ public abstract class Compiler extends compiler implements ICompiler {
 		}
 		includes();
 	}
-	
+
 	public Set<String> getFilenames() {
 		return filenames;
 	}
@@ -63,6 +63,6 @@ public abstract class Compiler extends compiler implements ICompiler {
 	public String getCharset() {
 		return charset;
 	}
-	
-	public abstract void includes () throws Exception;
+
+	public abstract void includes() throws Exception;
 }

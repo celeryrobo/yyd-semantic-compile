@@ -1,9 +1,11 @@
 package com.ybnf.compiler.utils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.ybnf.compiler.impl.JCompiler;
 import com.ybnf.compiler.impl.OriginalInclude;
@@ -18,7 +20,7 @@ public class YbnfStruct {
 	private String version;
 	private String charset;
 	private String service;
-	private List<Object> includes;
+	private Set<Object> includes;
 	private List<CallableStruct> callableStructs;
 	private String main;
 	private String body;
@@ -29,7 +31,7 @@ public class YbnfStruct {
 	private Object grammarSchema = null;
 
 	public YbnfStruct() {
-		includes = new LinkedList<>();
+		includes = new HashSet<>();
 		callableStructs = new LinkedList<>();
 		ybnfStructs = new LinkedList<>();
 	}
@@ -39,24 +41,29 @@ public class YbnfStruct {
 			return;
 		}
 		try {
-			String buffer;
-			for (Object include : includes) {
-				YbnfStruct ybnfStruct = null;
-				if (include.equals("original.ybnf")) {
-					buffer = new OriginalInclude().readContent();
-					ybnfStruct = new YbnfStruct();
-					ybnfStruct.setVersion(getVersion());
-					ybnfStruct.setCharset(getCharset());
-					ybnfStruct.setBody(buffer);
-				} else {
-					ybnfStruct = JCompiler.convertGrammar((String) include);
-				}
-				if (ybnfStruct != null) {
-					ybnfStructs.add(ybnfStruct);
-				}
-			}
+			buildIncludes(new HashSet<>());
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+
+	private void buildIncludes(Set<Object> sets) throws Exception {
+		for (Object include : includes) {
+			if (sets.contains(include)) {
+				continue;
+			}
+			sets.add(include);
+			YbnfStruct ybnfStruct = null;
+			if (include.equals("original.ybnf")) {
+				ybnfStruct = new YbnfStruct();
+				ybnfStruct.setVersion(getVersion());
+				ybnfStruct.setCharset(getCharset());
+				ybnfStruct.setBody(new OriginalInclude().readContent());
+			} else {
+				ybnfStruct = JCompiler.convertGrammar((String) include);
+				ybnfStruct.buildIncludes(sets);
+			}
+			ybnfStructs.add(ybnfStruct);
 		}
 	}
 
@@ -117,7 +124,6 @@ public class YbnfStruct {
 		if (grammarSchema == null) {
 			includes();
 			String grammar = mergeGrammar() + "\n" + buildCallTempVars();
-			System.out.println(grammar);
 			grammarSchema = CompilerUtils.parser(grammar);
 			try {
 				genSchema("");
@@ -133,18 +139,20 @@ public class YbnfStruct {
 		Object schema = grammarSchema;
 		String callBuffer = runCallables(lang);
 		if (!callBuffer.isEmpty()) {
-			System.out.println("Service's Name : " + getService());
 			StringBuilder sb = new StringBuilder("#YBNF ");
 			sb.append(getVersion()).append(" ").append(getCharset()).append(";\n").append(callBuffer);
 			YbnfStruct ybnfStruct = JCompiler.convertGrammar(sb.toString());
-			schema = ybnfStruct.genSchema(lang);
-			Object sch = CompilerUtils.into(((Parser) grammarSchema).grammar, ((Parser) schema).grammar);
-			Object hashMap = CompilerUtils.hashmap(CompilerUtils.keyword("grammar"), sch,
-					CompilerUtils.keyword("start-production"), CompilerUtils.keyword("root"),
-					CompilerUtils.keyword("output-format"), CompilerUtils.keyword("hiccup"));
-			schema = Parser.create((IPersistentMap) hashMap);
+			schema = mergeSchema((Parser) grammarSchema, (Parser) ybnfStruct.genSchema(lang));
 		}
 		return schema;
+	}
+
+	private Object mergeSchema(Parser parent, Parser child) {
+		Object sch = CompilerUtils.into(parent.grammar, child.grammar);
+		Object hashMap = CompilerUtils.hashmap(CompilerUtils.keyword("grammar"), sch,
+				CompilerUtils.keyword("start-production"), CompilerUtils.keyword("root"),
+				CompilerUtils.keyword("output-format"), CompilerUtils.keyword("hiccup"));
+		return Parser.create((IPersistentMap) hashMap);
 	}
 
 	public String getVersion() {
@@ -187,7 +195,7 @@ public class YbnfStruct {
 		this.body = body;
 	}
 
-	public List<Object> getIncludes() {
+	public Set<Object> getIncludes() {
 		return includes;
 	}
 

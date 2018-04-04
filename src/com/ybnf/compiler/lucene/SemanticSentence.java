@@ -1,11 +1,9 @@
 package com.ybnf.compiler.lucene;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -26,6 +24,7 @@ import org.nlpcn.commons.lang.tire.domain.Forest;
 import org.nlpcn.commons.lang.util.StringUtil;
 
 import com.ybnf.compiler.beans.YbnfCompileResult;
+import com.ybnf.compiler.impl.JCompiler;
 
 public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
@@ -100,35 +99,21 @@ public class SemanticSentence {
 		return keywords;
 	}
 
-	private Map<String, String> buildSentence(String text, String template) throws Exception {
-		Set<String> names = new HashSet<>();
+	private String buildSentence(String text, String template) throws Exception {
 		StringBuilder regexBuilder = new StringBuilder();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
-		String entities = StringUtil.joiner(sentences, "|");
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (token.startsWith("$")) {
-				String name = token.substring(1);
-				regexBuilder.append("(?<").append(name).append(">").append(entities).append(")");
-				names.add(name);
+				regexBuilder.append("(.+)");
 			} else {
 				regexBuilder.append(token);
 			}
 		}
 		LOG.info("Regex : " + regexBuilder);
-		Pattern pattern = Pattern.compile(regexBuilder.toString());
-		Matcher matcher = pattern.matcher(text);
+		Matcher matcher = Pattern.compile(regexBuilder.toString()).matcher(text);
 		if (matcher.find()) {
-			String target = matcher.group();
-			float score = ParserUtils.distanceScore(text, target);
-			if (score < 0.33f) {
-				throw new Exception("Semantic Match Failture (score[" + score + "] less than 0.33) !");
-			}
-			Map<String, String> objects = new HashMap<>();
-			for (String name : names) {
-				objects.put(name, matcher.group(name));
-			}
-			return objects;
+			return matcher.group();
 		}
 		throw new Exception("Semantic Match Failture !");
 	}
@@ -157,12 +142,22 @@ public class SemanticSentence {
 	}
 
 	public YbnfCompileResult compile(String template) throws Exception {
-		Map<String, String> objects = buildSentence(lang, template);
-		Map<String, String> slots = new HashMap<>();
-		if (!intent.isEmpty()) {
-			slots.put("intent", intent);
+		String entities = "null";
+		if (!sentences.isEmpty()) {
+			entities = StringUtil.joiner(sentences, "|");
 		}
-		return new YbnfCompileResult(lang, "0.1", "UTF8", service, objects, slots);
+		String sentence = buildSentence(lang, template);
+		StringBuilder sb = new StringBuilder();
+		sb.append("#YBNF 1.0 utf8;");
+		sb.append("#include classpath:semantics/ybnf/common.ybnf;");
+		sb.append("service ").append(service).append(";");
+		sb.append("root $main;");
+		sb.append("$main{intent%").append(intent).append("} = ").append(template)
+				.append(" {$_yyd_ch_|$_yyd_punctuation_};");
+		for (String type : entTypes) {
+			sb.append("$").append(type).append("{").append(type).append("} = ").append(entities).append(";");
+		}
+		return new JCompiler(sb.toString()).compile(sentence);
 	}
 
 	public YbnfCompileResult compile(TemplateEntity templateEntity) throws Exception {

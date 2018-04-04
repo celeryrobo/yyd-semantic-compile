@@ -48,13 +48,10 @@ public class JCompiler implements ICompiler {
 	}
 
 	public static YbnfStruct convertGrammar(String grammar) throws Exception {
-		Object trans = null;
 		if (grammar.endsWith(".ybnf")) {
-			trans = ENGINE.compile(CompilerUtils.readFile(grammar));
-		} else {
-			trans = ENGINE.compile(grammar);
+			return (YbnfStruct) ENGINE.compile(CompilerUtils.readFile(grammar));
 		}
-		return (YbnfStruct) trans;
+		return (YbnfStruct) ENGINE.compile(grammar);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -22,7 +22,7 @@ public class MITIECompiler implements ICompiler {
 	private TextCategorizer textCategorizer = null;
 	private NamedEntityExtractor namedEntityExtractor = null;
 	private StringVector possibleTags;
-	
+
 	public MITIECompiler(String categoryFilename, String featureExtractorFilename) {
 		this(categoryFilename, null, featureExtractorFilename);
 	}

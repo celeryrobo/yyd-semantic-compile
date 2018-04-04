@@ -24,7 +24,7 @@ public class SemanticIntent {
 	public String getName() {
 		return name;
 	}
-	
+
 	public Set<String> getEntTypes() {
 		return entTypes;
 	}
@@ -51,7 +51,7 @@ public class SemanticIntent {
 	public Set<Template> getTemplates() {
 		return templates;
 	}
-	
+
 	public void resetTemplates() {
 		templates = new HashSet<>();
 	}
