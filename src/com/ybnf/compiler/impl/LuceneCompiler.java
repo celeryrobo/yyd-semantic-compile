@@ -50,9 +50,7 @@ public class LuceneCompiler implements ICompiler {
 
 	public LuceneCompiler(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
 		if (sceneIntentTemplates != null) {
-			synchronized (SERVICES) {
-				init(sceneIntentTemplates);
-			}
+			init(sceneIntentTemplates);
 		}
 	}
 

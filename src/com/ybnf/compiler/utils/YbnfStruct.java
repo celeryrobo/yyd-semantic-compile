@@ -27,6 +27,7 @@ public class YbnfStruct {
 	private SemanticCallable semanticCallable;
 	private List<YbnfStruct> ybnfStructs;
 	private Map<String, VarnameStruct> kvs;
+	private static final Map<Object, YbnfStruct> INCLUDE_STRUCTS = new HashMap<>(); // 头文件缓存
 
 	private Object grammarSchema = null;
 
@@ -53,15 +54,18 @@ public class YbnfStruct {
 				continue;
 			}
 			sets.add(include);
-			YbnfStruct ybnfStruct = null;
-			if (include.equals("original.ybnf")) {
-				ybnfStruct = new YbnfStruct();
-				ybnfStruct.setVersion(getVersion());
-				ybnfStruct.setCharset(getCharset());
-				ybnfStruct.setBody(new OriginalInclude().readContent());
-			} else {
-				ybnfStruct = JCompiler.convertGrammar((String) include);
-				ybnfStruct.buildIncludes(sets);
+			YbnfStruct ybnfStruct = INCLUDE_STRUCTS.get(include);
+			if (ybnfStruct == null) {
+				if (include.equals("original.ybnf")) {
+					ybnfStruct = new YbnfStruct();
+					ybnfStruct.setVersion(getVersion());
+					ybnfStruct.setCharset(getCharset());
+					ybnfStruct.setBody(new OriginalInclude().readContent());
+				} else {
+					ybnfStruct = JCompiler.convertGrammar((String) include);
+					ybnfStruct.buildIncludes(sets);
+				}
+				INCLUDE_STRUCTS.put(include, ybnfStruct);
 			}
 			ybnfStructs.add(ybnfStruct);
 		}
