@@ -119,8 +119,8 @@ public class YbnfCompiler extends Compiler {
 	@Override
 	public YbnfCompileResult compile(String text) {
 		Map<String, Map<String, String>> result = (Map<String, Map<String, String>>) execCompile(text);
-		Map<String, String> objects = (Map<String, String>) result.get("objects");
-		Map<String, String> slots = (Map<String, String>) result.get("slots");
+		Map<String, String> objects = result.get("objects");
+		Map<String, String> slots = result.get("slots");
 		return new YbnfCompileResult(text, getVersion(), getCharset(), getService(), objects, slots);
 	}
 

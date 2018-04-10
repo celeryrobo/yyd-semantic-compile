@@ -1,9 +1,11 @@
 package com.ybnf.compiler.lucene;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -21,13 +23,29 @@ import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.nlpcn.commons.lang.tire.domain.Forest;
-import org.nlpcn.commons.lang.util.StringUtil;
 
 import com.ybnf.compiler.beans.YbnfCompileResult;
-import com.ybnf.compiler.impl.JCompiler;
+import com.ybnf.dsl.DslService;
+import com.ybnf.dsl.parser.Parser;
+import com.ybnf.dsl.parser.impl.DIGIT;
+import com.ybnf.dsl.parser.impl.GROUP;
+import com.ybnf.dsl.parser.impl.ORR;
+import com.ybnf.dsl.parser.impl.OneOrMany;
+import com.ybnf.dsl.parser.impl.SELECTABLE;
+import com.ybnf.dsl.parser.impl.WORD;
 
 public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
+	private static final DslService dslService = new DslService();
+	static {
+		// 数字
+		Parser number = new ORR(new WORD("零"), new WORD("一"), new WORD("二"), new WORD("三"), new WORD("四"),
+				new WORD("五"), new WORD("六"), new WORD("七"), new WORD("八"), new WORD("九"), new WORD("九"), new WORD("十"),
+				new WORD("百"), new WORD("千"), new WORD("万"), new WORD("亿"), new DIGIT());
+		number = new OneOrMany(number);
+		number = new GROUP(number, new SELECTABLE(new GROUP(new WORD("."), number)));
+		dslService.include("number", number);
+	}
 	private String intent = "";
 	private String lang;
 	private String service;
@@ -35,6 +53,7 @@ public class SemanticSentence {
 	private Set<String> entTypes;
 	private List<String> keywords;
 	private List<String> sentences;
+	private DslService dsl;
 
 	public SemanticSentence(String service, String lang, Set<String> entTypes) {
 		this.lang = lang;
@@ -50,6 +69,7 @@ public class SemanticSentence {
 			forests[i] = dics[i - 1];
 		}
 		initSentence(lang, forests);
+		initDslService();
 	}
 
 	private void initSentence(String lang, Forest... forests) {
@@ -84,6 +104,36 @@ public class SemanticSentence {
 			}
 		}
 		return terms;
+	}
+
+	private void initDslService() {
+		dsl = new DslService(dslService);
+		if (sentences.isEmpty()) {
+			return;
+		}
+		Parser parser = null;
+		int size = sentences.size();
+		switch (size) {
+		case 1: {
+			parser = new WORD(sentences.get(0));
+			break;
+		}
+		case 2: {
+			parser = new ORR(new WORD(sentences.get(0)), new WORD(sentences.get(1)));
+			break;
+		}
+		default: {
+			Parser[] arr = new Parser[size - 2];
+			for (int i = 0; i < arr.length; i++) {
+				arr[i] = new WORD(sentences.get(i + 2));
+			}
+			parser = new ORR(new WORD(sentences.get(0)), new WORD(sentences.get(1)), arr);
+			break;
+		}
+		}
+		for (String type : types) {
+			dsl.map(type, parser);
+		}
 	}
 
 	public SemanticSentence intent(String intent) {
@@ -142,22 +192,13 @@ public class SemanticSentence {
 	}
 
 	public YbnfCompileResult compile(String template) throws Exception {
-		String entities = "null";
-		if (!sentences.isEmpty()) {
-			entities = StringUtil.joiner(sentences, "|");
-		}
 		String sentence = buildSentence(lang, template);
-		StringBuilder sb = new StringBuilder();
-		sb.append("#YBNF 1.0 utf8;");
-		sb.append("#include classpath:semantics/ybnf/common.ybnf;");
-		sb.append("service ").append(service).append(";");
-		sb.append("root $main;");
-		sb.append("$main{intent%").append(intent).append("} = ").append(template)
-				.append(" {$_yyd_ch_|$_yyd_punctuation_};");
-		for (String type : entTypes) {
-			sb.append("$").append(type).append("{").append(type).append("} = ").append(entities).append(";");
+		Map<String, String> slots = new HashMap<>();
+		if (intent != null) {
+			slots.put("intent", intent);
 		}
-		return new JCompiler(sb.toString()).compile(sentence);
+		Map<String, String> objects = dsl.compile(template, sentence);
+		return new YbnfCompileResult(lang, "1.0", "UTF-8", service, objects, slots);
 	}
 
 	public YbnfCompileResult compile(TemplateEntity templateEntity) throws Exception {
