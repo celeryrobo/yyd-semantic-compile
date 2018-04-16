@@ -20,11 +20,15 @@ import com.ybnf.semantic.SemanticCallable;
 
 public class LuceneCompiler implements ICompiler {
 	private static final Logger LOG = Logger.getLogger(LuceneCompiler.class.getSimpleName());
-	private static Map<String, SemanticService> SERVICES = new HashMap<>();
+	private Map<String, SemanticService> services = null;
 	private SemanticService semanticService = null;
 
-	private static void init(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
+	public LuceneCompiler(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
+		if (sceneIntentTemplates == null) {
+			return;
+		}
 		try (IndexWriterService writerService = new IndexWriterService()) {
+			services = new HashMap<>();
 			for (Entry<String, Map<String, List<String>>> sceneIntentTemplate : sceneIntentTemplates.entrySet()) {
 				String sceneName = sceneIntentTemplate.getKey();
 				SemanticService service = new SemanticService(sceneName);
@@ -36,21 +40,18 @@ public class LuceneCompiler implements ICompiler {
 					}
 				}
 				writerService.initSemanticService(service);
-				SERVICES.put(sceneName, service);
+				services.put(sceneName, service);
 			}
 		}
 	}
 
-	public LuceneCompiler(String service) throws Exception {
-		semanticService = SERVICES.get(service);
+	public LuceneCompiler(LuceneCompiler compiler, String service) throws Exception {
+		if (compiler == null || compiler.services == null) {
+			throw new Exception("参数compiler为空或compiler.services为空！");
+		}
+		semanticService = compiler.services.get(service);
 		if (semanticService == null) {
 			throw new Exception("场景:" + service + "，不存在！");
-		}
-	}
-
-	public LuceneCompiler(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
-		if (sceneIntentTemplates != null) {
-			init(sceneIntentTemplates);
 		}
 	}
 
