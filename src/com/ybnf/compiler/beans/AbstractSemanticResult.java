@@ -36,25 +36,9 @@ public abstract class AbstractSemanticResult {
 		 */
 		U,
 		/**
-		 * 文本+资源URL
+		 * 图片URL
 		 */
-		TU,
-		/**
-		 * 图片URL+文本
-		 */
-		IT,
-		/**
-		 * 命令+文本
-		 */
-		TC,
-		/**
-		 * 图片URL+资源URL
-		 */
-		IU,
-		/**
-		 * 图片URL+文本+资源URL
-		 */
-		ITU
+		I,
 	}
 
 	@JsonIgnore
@@ -64,7 +48,7 @@ public abstract class AbstractSemanticResult {
 	@JsonIgnore
 	private Operation operation = Operation.SPEAK;
 	@JsonIgnore
-	private ParamType paramType = ParamType.T;
+	private String paramType = ParamType.T.toString();
 	@JsonIgnore
 	private Object resource = null;
 
@@ -97,12 +81,23 @@ public abstract class AbstractSemanticResult {
 		this.operation = operation;
 	}
 
-	public ParamType getParamType() {
+	public String getParamType() {
 		return paramType;
 	}
 
-	public void setParamType(ParamType paramType) {
+	public void setParamType(String paramType) {
 		this.paramType = paramType;
+	}
+
+	public void setParamType(ParamType... paramTypes) {
+		if (paramTypes.length == 0) {
+			return;
+		}
+		StringBuilder sb = new StringBuilder();
+		for (ParamType paramType : paramTypes) {
+			sb.append(paramType);
+		}
+		this.paramType = sb.toString();
 	}
 
 	public Object getResource() {
