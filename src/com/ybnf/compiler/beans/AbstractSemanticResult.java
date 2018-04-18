@@ -89,13 +89,10 @@ public abstract class AbstractSemanticResult {
 		this.paramType = paramType;
 	}
 
-	public void setParamType(ParamType... paramTypes) {
-		if (paramTypes.length == 0) {
-			return;
-		}
-		StringBuilder sb = new StringBuilder();
-		for (ParamType paramType : paramTypes) {
-			sb.append(paramType);
+	public void setParamType(ParamType paramType, ParamType... paramTypes) {
+		StringBuilder sb = new StringBuilder().append(paramType);
+		for (ParamType type : paramTypes) {
+			sb.append(type);
 		}
 		this.paramType = sb.toString();
 	}

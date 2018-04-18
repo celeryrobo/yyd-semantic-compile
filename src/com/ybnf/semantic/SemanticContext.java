@@ -27,14 +27,14 @@ public interface SemanticContext {
 	void setService(String service);
 
 	/**
-	 * 获取上次请求设置的语义参数信息
+	 * 获取上次请求设置的语义参数信息，当场景切换时参数清空，用户可以自定义参数和值
 	 * 
 	 * @return 语义实体字典
 	 */
 	Map<Object, Object> getParams();
 
 	/**
-	 * 获取当前用户的属性
+	 * 获取当前用户的属性，当前会话用户的属性参数，当会话过期或用户手动清空时清空参数，用户可以自定义参数和值
 	 * 
 	 * @return 语义实体字典
 	 */
