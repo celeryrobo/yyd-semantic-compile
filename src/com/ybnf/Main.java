@@ -3,6 +3,8 @@ package com.ybnf;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.ybnf.dsl.DslService;
@@ -67,5 +69,10 @@ public class Main {
 				.map("song", orParser).compile("我想听 $num 首 $singer 的 $song", "我想听101.11首刘德华的冰雨呀");
 		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);
+		
+		Matcher matcher = Pattern.compile("我想听(.+我想听|我想听|李白|的|静夜思)的(.*我想听|我想听|李白|的|静夜思)").matcher("我想听我想听李白的静夜思");
+		if(matcher.find()) {
+			System.out.println(matcher.group());
+		}
 	}
 }

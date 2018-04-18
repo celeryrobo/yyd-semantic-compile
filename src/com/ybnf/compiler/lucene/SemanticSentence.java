@@ -23,6 +23,7 @@ import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.nlpcn.commons.lang.tire.domain.Forest;
+import org.nlpcn.commons.lang.util.StringUtil;
 
 import com.ybnf.compiler.beans.YbnfCompileResult;
 import com.ybnf.dsl.DslService;
@@ -152,10 +153,11 @@ public class SemanticSentence {
 	private String buildSentence(String text, String template) throws Exception {
 		StringBuilder regexBuilder = new StringBuilder();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
+		String sentence = StringUtil.joiner(sentences, "|");
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (token.startsWith("$")) {
-				regexBuilder.append("(.+)");
+				regexBuilder.append("(.+").append(sentence).append(")");
 			} else {
 				regexBuilder.append(token);
 			}
