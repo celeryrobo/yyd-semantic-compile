@@ -28,25 +28,11 @@ import org.nlpcn.commons.lang.util.StringUtil;
 import com.ybnf.compiler.beans.YbnfCompileResult;
 import com.ybnf.dsl.DslService;
 import com.ybnf.dsl.parser.Parser;
-import com.ybnf.dsl.parser.impl.DIGIT;
-import com.ybnf.dsl.parser.impl.GROUP;
 import com.ybnf.dsl.parser.impl.ORR;
-import com.ybnf.dsl.parser.impl.OneOrMany;
-import com.ybnf.dsl.parser.impl.SELECTABLE;
 import com.ybnf.dsl.parser.impl.WORD;
 
 public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
-	private static final DslService dslService = new DslService();
-	static {
-		// 数字
-		Parser number = new ORR(new WORD("零"), new WORD("一"), new WORD("二"), new WORD("三"), new WORD("四"),
-				new WORD("五"), new WORD("六"), new WORD("七"), new WORD("八"), new WORD("九"), new WORD("九"), new WORD("十"),
-				new WORD("百"), new WORD("千"), new WORD("万"), new WORD("亿"), new DIGIT());
-		number = new OneOrMany(number);
-		number = new GROUP(number, new SELECTABLE(new GROUP(new WORD("."), number)));
-		dslService.include("number", number);
-	}
 	private String intent = "";
 	private String lang;
 	private String service;
@@ -108,7 +94,7 @@ public class SemanticSentence {
 	}
 
 	private void initDslService() {
-		dsl = new DslService(dslService);
+		dsl = new DslService();
 		if (sentences.isEmpty()) {
 			return;
 		}
@@ -157,7 +143,7 @@ public class SemanticSentence {
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (token.startsWith("$")) {
-				regexBuilder.append("(.+").append(sentence).append(")");
+				regexBuilder.append("(").append(sentence).append(")");
 			} else {
 				regexBuilder.append(token);
 			}
