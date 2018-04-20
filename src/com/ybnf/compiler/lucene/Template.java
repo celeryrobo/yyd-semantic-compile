@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.ansj.library.DicLibrary;
+import org.ansj.util.MyStaticValue;
 
 public class Template {
 	private String template;
@@ -20,7 +20,7 @@ public class Template {
 			String word = tokenizer.nextToken();
 			if (word.startsWith("$")) {
 				String varName = word.substring(1);
-				if (DicLibrary.keys().contains(varName)) {
+				if (MyStaticValue.ENV.containsKey(varName)) {
 					entTypes.add(varName);
 				}
 			} else {

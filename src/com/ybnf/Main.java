@@ -49,7 +49,7 @@ public class Main {
 		
 		long start = System.currentTimeMillis();
 		DslService service = new DslService();
-		Object o = service.compile("声音增大 $number 格", "声音增大一格");
+		Object o = service.compile("声音增大 $number 格", "声音增大1格");
 		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);
 	}
