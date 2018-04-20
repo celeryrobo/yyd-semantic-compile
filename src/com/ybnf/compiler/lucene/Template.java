@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import com.ybnf.dsl.DslService;
+import org.ansj.library.DicLibrary;
 
 public class Template {
 	private String template;
@@ -20,7 +20,7 @@ public class Template {
 			String word = tokenizer.nextToken();
 			if (word.startsWith("$")) {
 				String varName = word.substring(1);
-				if (!DslService.DSL_INCLUDE_SERVICE.containsKey(varName)) {
+				if (DicLibrary.keys().contains(varName)) {
 					entTypes.add(varName);
 				}
 			} else {

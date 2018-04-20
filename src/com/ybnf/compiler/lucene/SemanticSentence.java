@@ -68,12 +68,11 @@ public class SemanticSentence {
 		for (org.ansj.domain.Term term : terms) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
+			sentences.add(name);
 			if ("kv".equals(natureStr)) {
 				keywords.add(name);
-				sentences.add(name);
 			} else if (natureStr.startsWith("c:")) {
 				types.add(natureStr.substring(2));
-				sentences.add(name);
 			}
 		}
 	}
