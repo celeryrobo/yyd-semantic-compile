@@ -21,9 +21,9 @@ public class DslService {
 	public static final DslService DSL_INCLUDE_SERVICE = new DslService();
 	static {
 		// 数字
-		Parser number = new ORR(new WORD("零"), new WORD("一"), new WORD("二"), new WORD("三"), new WORD("四"),
-				new WORD("五"), new WORD("六"), new WORD("七"), new WORD("八"), new WORD("九"), new WORD("九"), new WORD("十"),
-				new WORD("百"), new WORD("千"), new WORD("万"), new WORD("亿"), new DIGIT());
+		Parser number = new ORR(new WORD("零"), new WORD("一"), new WORD("二"), new WORD("两"), new WORD("三"),
+				new WORD("四"), new WORD("五"), new WORD("六"), new WORD("七"), new WORD("八"), new WORD("九"), new WORD("九"),
+				new WORD("十"), new WORD("百"), new WORD("千"), new WORD("万"), new WORD("亿"), new DIGIT());
 		number = new OneOrMany(number);
 		number = new GROUP(number, new SELECTABLE(new GROUP(new WORD("."), number)));
 		DSL_INCLUDE_SERVICE.include("number", number);
