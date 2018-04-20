@@ -18,7 +18,7 @@ import com.ybnf.dsl.parser.impl.SELECTABLE;
 import com.ybnf.dsl.parser.impl.WORD;
 
 public class DslService {
-	private static final DslService dslService = new DslService();
+	public static final DslService DSL_INCLUDE_SERVICE = new DslService();
 	static {
 		// 数字
 		Parser number = new ORR(new WORD("零"), new WORD("一"), new WORD("二"), new WORD("三"), new WORD("四"),
@@ -26,12 +26,12 @@ public class DslService {
 				new WORD("百"), new WORD("千"), new WORD("万"), new WORD("亿"), new DIGIT());
 		number = new OneOrMany(number);
 		number = new GROUP(number, new SELECTABLE(new GROUP(new WORD("."), number)));
-		dslService.include("number", number);
+		DSL_INCLUDE_SERVICE.include("number", number);
 	}
 	private Map<String, Parser> includes;
 
 	public DslService() {
-		this(dslService);
+		this(DSL_INCLUDE_SERVICE);
 	}
 
 	public DslService(DslService service) {
@@ -40,6 +40,10 @@ public class DslService {
 		} else {
 			includes = new HashMap<>(service.includes);
 		}
+	}
+
+	public boolean containsKey(String key) {
+		return includes.containsKey(key);
 	}
 
 	public DslService include(String name, Parser parser) {

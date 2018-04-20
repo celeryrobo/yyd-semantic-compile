@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.ybnf.dsl.DslService;
+
 public class Template {
 	private String template;
 	private List<String> keywords;
@@ -17,7 +19,10 @@ public class Template {
 		while (tokenizer.hasMoreTokens()) {
 			String word = tokenizer.nextToken();
 			if (word.startsWith("$")) {
-				entTypes.add(word.substring(1));
+				String varName = word.substring(1);
+				if (!DslService.DSL_INCLUDE_SERVICE.containsKey(varName)) {
+					entTypes.add(varName);
+				}
 			} else {
 				keywords.add(word);
 			}
