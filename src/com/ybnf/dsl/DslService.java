@@ -73,11 +73,12 @@ public class DslService {
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (token.startsWith("$")) {
-				Parser parser = includes.get(token.substring(1));
+				String varName = token.substring(1);
+				Parser parser = includes.get(varName);
 				if (parser == null) {
 					throw new Exception(token + " is not exsit!");
 				}
-				parsers.add(parser);
+				parsers.add(new NamedParser(varName, parser));
 			} else {
 				parsers.add(new WORD(token));
 			}

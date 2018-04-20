@@ -3,18 +3,9 @@ package com.ybnf;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.ybnf.dsl.DslService;
-import com.ybnf.dsl.parser.Parser;
-import com.ybnf.dsl.parser.impl.DIGIT;
-import com.ybnf.dsl.parser.impl.GROUP;
-import com.ybnf.dsl.parser.impl.ORR;
-import com.ybnf.dsl.parser.impl.OneOrMany;
-import com.ybnf.dsl.parser.impl.SELECTABLE;
-import com.ybnf.dsl.parser.impl.WORD;
 
 class U {
 	private String service;
@@ -57,22 +48,9 @@ public class Main {
 		System.out.println(r);
 		
 		long start = System.currentTimeMillis();
-		Parser number = new ORR(new WORD("零"), new WORD("一"), new WORD("二"), new WORD("三"), new WORD("四"),
-				new WORD("五"), new WORD("六"), new WORD("七"), new WORD("八"), new WORD("九"), new WORD("九"), new WORD("十"),
-				new WORD("百"), new WORD("千"), new WORD("万"), new WORD("亿"), new DIGIT());
-		number = new OneOrMany(number);
-		number = new GROUP(number, new SELECTABLE(new GROUP(new WORD("."), number)));
-		Parser orParser = new ORR(new WORD("我想听"), new WORD("刘德华"), new WORD("的"), new WORD("冰雨"));
 		DslService service = new DslService();
-		service.include("number", number);
-		Object o = service.assign("num", "number").map("singer", orParser)
-				.map("song", orParser).compile("我想听 $num 首 $singer 的 $song", "我想听101.11首刘德华的冰雨呀");
+		Object o = service.compile("声音增大 $number 格", "声音增大一格");
 		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);
-		
-		Matcher matcher = Pattern.compile("我想听(.+我想听|我想听|李白|的|静夜思)的(.*我想听|我想听|李白|的|静夜思)").matcher("我想听我想听李白的静夜思");
-		if(matcher.find()) {
-			System.out.println(matcher.group());
-		}
 	}
 }

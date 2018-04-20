@@ -118,7 +118,7 @@ public class SemanticSentence {
 		}
 		}
 		for (String type : types) {
-			dsl.map(type, parser);
+			dsl.include(type, parser);
 		}
 	}
 
