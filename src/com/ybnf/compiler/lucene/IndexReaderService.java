@@ -43,7 +43,8 @@ public class IndexReaderService extends LuceneService {
 		String service = doc.get("service");
 		String intent = doc.get("intent");
 		String template = doc.get("template");
-		return new TemplateEntity(service, intent, template);
+		float score = scoreDoc.score;
+		return new TemplateEntity(service, intent, template, score);
 	}
 
 	@Override

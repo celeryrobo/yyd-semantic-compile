@@ -52,7 +52,7 @@ public class TemplateBuilder {
 	public List<Template> build() {
 		List<Template> templates = new LinkedList<>();
 		for (StringBuilder sb : builders) {
-			templates.add(new Template(sb.toString().trim()));
+			templates.add(new Template(sb.toString().trim().replaceAll("\\s+", " ")));
 		}
 		return templates;
 	}

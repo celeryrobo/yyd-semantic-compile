@@ -1,7 +1,9 @@
 package com.ybnf.compiler.lucene;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.ansj.util.MyStaticValue;
@@ -9,17 +11,20 @@ import org.ansj.util.MyStaticValue;
 public class Template {
 	private String template;
 	private List<String> keywords;
-	private List<String> entTypes;
+	private Set<String> entTypes;
+	private Set<String> varTypes;
 
 	public Template(String template) {
 		this.template = template;
 		this.keywords = new ArrayList<>();
-		this.entTypes = new ArrayList<>();
+		this.entTypes = new HashSet<>();
+		this.varTypes = new HashSet<>();
 		StringTokenizer tokenizer = new StringTokenizer(template);
 		while (tokenizer.hasMoreTokens()) {
 			String word = tokenizer.nextToken();
 			if (word.startsWith("$")) {
 				String varName = word.substring(1);
+				varTypes.add(varName);
 				if (MyStaticValue.ENV.containsKey(varName)) {
 					entTypes.add(varName);
 				}
@@ -37,8 +42,12 @@ public class Template {
 		return keywords;
 	}
 
-	public List<String> getEntTypes() {
+	public Set<String> getEntTypes() {
 		return entTypes;
+	}
+
+	public Set<String> getVarTypes() {
+		return varTypes;
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import org.ansj.domain.Result;
 import org.ansj.library.DicLibrary;
+import org.ansj.recognition.Recognition;
 import org.ansj.recognition.impl.UserDicNatureRecognition;
 import org.ansj.splitWord.analysis.IndexAnalysis;
 import org.apache.lucene.index.Term;
@@ -33,19 +34,27 @@ import com.ybnf.dsl.parser.impl.WORD;
 
 public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
+	private static final Map<String, Recognition[]> RECOGNITIONS;
+	static {
+		RECOGNITIONS = new HashMap<>();
+		RECOGNITIONS.put("number", new Recognition[] { new RegexRecognition("\\d+(\\.\\d+){0,1}", "number"),
+				new RegexRecognition("((零|一|二|三|四|五|六|七|八|九|十)(十|百|千|万|亿|兆)*)+", "number") });
+	}
 	private String intent = "";
 	private String lang;
 	private String service;
 	private Set<String> types;
 	private Set<String> entTypes;
+	private Set<String> varTypes;
 	private List<String> keywords;
 	private List<String> sentences;
 	private DslService dsl;
 
-	public SemanticSentence(String service, String lang, Set<String> entTypes) {
+	public SemanticSentence(String service, String lang, Set<String> entTypes, Set<String> varTypes) {
 		this.lang = lang;
 		this.service = service;
 		this.entTypes = entTypes;
+		this.varTypes = varTypes;
 		this.types = new HashSet<>();
 		this.keywords = new LinkedList<>();
 		this.sentences = new ArrayList<>();
@@ -61,6 +70,14 @@ public class SemanticSentence {
 
 	private void initSentence(String lang, Forest... forests) {
 		Result result = IndexAnalysis.parse(lang, forests);
+		for (String varType : varTypes) {
+			Recognition[] recognitions = RECOGNITIONS.get(varType);
+			if (recognitions != null) {
+				for (Recognition recognition : recognitions) {
+					recognition.recognition(result);
+				}
+			}
+		}
 		new UserDicNatureRecognition(forests).recognition(result);
 		LOG.info(result.toString());
 		List<org.ansj.domain.Term> terms = filterTerms(lang, result);
@@ -71,8 +88,6 @@ public class SemanticSentence {
 			sentences.add(name);
 			if ("kv".equals(natureStr)) {
 				keywords.add(name);
-			} else if (natureStr.startsWith("c:")) {
-				types.add(natureStr.substring(2));
 			}
 		}
 	}
@@ -82,11 +97,15 @@ public class SemanticSentence {
 		int totalSize = 0, curSize = 0, curIndex = 0;
 		for (org.ansj.domain.Term term : result) {
 			String realName = term.getRealName();
+			String natureStr = term.getNatureStr();
 			curIndex = lang.indexOf(realName, totalSize - curSize - 1);
 			if (curIndex >= totalSize) {
 				curSize = realName.length();
 				totalSize += curSize;
 				terms.add(term);
+			}
+			if (natureStr.startsWith("c:")) {
+				types.add(natureStr.substring(2));
 			}
 		}
 		return terms;
@@ -156,6 +175,9 @@ public class SemanticSentence {
 	}
 
 	public Query buildQuery(String fieldName) {
+		if (keywords.isEmpty() && varTypes.isEmpty()) {
+			return null;
+		}
 		BooleanQuery.Builder booleanBuilder = new BooleanQuery.Builder();
 		if (!keywords.isEmpty()) {
 			PhraseQuery.Builder phraseBuilder = new PhraseQuery.Builder();
@@ -166,13 +188,8 @@ public class SemanticSentence {
 			}
 			booleanBuilder.add(phraseBuilder.build(), Occur.MUST);
 		}
-		for (String type : types) {
-			if (entTypes.contains(type)) {
-				booleanBuilder.add(new TermQuery(new Term(fieldName, type.toLowerCase())), Occur.SHOULD);
-			}
-		}
-		if (keywords.isEmpty() && types.isEmpty()) {
-			return null;
+		for (String type : varTypes) {
+			booleanBuilder.add(new TermQuery(new Term(fieldName, type.toLowerCase())), Occur.SHOULD);
 		}
 		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
 		return booleanBuilder.build();

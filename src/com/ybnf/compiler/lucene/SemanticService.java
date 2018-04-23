@@ -33,10 +33,12 @@ public class SemanticService {
 
 	public SemanticSentence buildSentence(String lang) {
 		Set<String> types = new HashSet<>();
+		Set<String> varTypes = new HashSet<>();
 		for (SemanticIntent intent : intents.values()) {
 			types.addAll(intent.getEntTypes());
+			varTypes.addAll(intent.getVarTypes());
 		}
-		return new SemanticSentence(name, lang, types);
+		return new SemanticSentence(name, lang, types, varTypes);
 	}
 
 	@Override

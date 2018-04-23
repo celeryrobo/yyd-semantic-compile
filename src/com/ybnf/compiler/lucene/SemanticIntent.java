@@ -11,12 +11,14 @@ import org.nlpcn.commons.lang.tire.library.Library;
 public class SemanticIntent {
 	private String name;
 	private Set<String> entTypes;
+	private Set<String> varTypes;
 	private Set<Template> templates;
 	private Forest forest;
 
 	SemanticIntent(String name) {
 		this.name = name;
 		this.entTypes = new HashSet<>();
+		this.varTypes = new HashSet<>();
 		this.forest = DicLibrary.get();
 		resetTemplates();
 	}
@@ -29,9 +31,14 @@ public class SemanticIntent {
 		return entTypes;
 	}
 
+	public Set<String> getVarTypes() {
+		return varTypes;
+	}
+
 	public void addTemplate(Template template) {
 		templates.add(template);
 		entTypes.addAll(template.getEntTypes());
+		varTypes.addAll(template.getVarTypes());
 		for (String keyword : template.getKeywords()) {
 			Library.insertWord(forest, new Value(keyword, "kv", "1"));
 		}
