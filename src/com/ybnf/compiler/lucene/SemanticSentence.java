@@ -37,8 +37,10 @@ public class SemanticSentence {
 	private static final Map<String, Recognition[]> RECOGNITIONS;
 	static {
 		RECOGNITIONS = new HashMap<>();
-		RECOGNITIONS.put("number", new Recognition[] { new RegexRecognition("\\d+(\\.\\d+){0,1}", "number"),
-				new RegexRecognition("((零|一|二|三|四|五|六|七|八|九|十)(十|百|千|万|亿|兆)*)+", "number") });
+		RECOGNITIONS.put("number", new Recognition[] {
+			new RegexRecognition("\\d+(\\.\\d+){0,1}", "number"),
+			new RegexRecognition("((零|一|二|三|四|五|六|七|八|九|十)(十|百|千|万|亿|兆)*)+", "number")
+		});
 	}
 	private String intent = "";
 	private String lang;
@@ -181,7 +183,7 @@ public class SemanticSentence {
 		BooleanQuery.Builder booleanBuilder = new BooleanQuery.Builder();
 		if (!keywords.isEmpty()) {
 			PhraseQuery.Builder phraseBuilder = new PhraseQuery.Builder();
-			phraseBuilder.setSlop(4);
+			phraseBuilder.setSlop(5);
 			int idx = 0;
 			for (String keyword : keywords) {
 				phraseBuilder.add(new Term(fieldName, keyword), idx++);

@@ -1,7 +1,7 @@
 package com.ybnf.dsl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -14,6 +14,7 @@ import com.ybnf.dsl.parser.impl.GROUP;
 import com.ybnf.dsl.parser.impl.NamedParser;
 import com.ybnf.dsl.parser.impl.ORR;
 import com.ybnf.dsl.parser.impl.OneOrMany;
+import com.ybnf.dsl.parser.impl.REGEX;
 import com.ybnf.dsl.parser.impl.SELECTABLE;
 import com.ybnf.dsl.parser.impl.WORD;
 
@@ -26,7 +27,9 @@ public class DslService {
 				new WORD("十"), new WORD("百"), new WORD("千"), new WORD("万"), new WORD("亿"), new DIGIT());
 		number = new OneOrMany(number);
 		number = new GROUP(number, new SELECTABLE(new GROUP(new WORD("."), number)));
+		Parser fuzzyWord = new ORR(new REGEX("\\p{script=Han}"), new REGEX("\\w"));
 		DSL_INCLUDE_SERVICE.include("number", number);
+		DSL_INCLUDE_SERVICE.include("fuzzyWord", fuzzyWord);
 	}
 	private Map<String, Parser> includes;
 
@@ -68,17 +71,49 @@ public class DslService {
 	}
 
 	public Map<String, String> compile(String template, String lang) throws Exception {
-		List<Parser> parsers = new LinkedList<>();
+		List<Parser> parsers = new ArrayList<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
+		List<String> tokens = new ArrayList<>();
 		while (tokenizer.hasMoreTokens()) {
-			String token = tokenizer.nextToken();
+			tokens.add(tokenizer.nextToken());
+		}
+		int start = 0, end = 0, size = tokens.size();
+		for (int i = 0; i < size; i++) {
+			String token = tokens.get(i);
 			if (token.startsWith("$")) {
 				String varName = token.substring(1);
-				Parser parser = includes.get(varName);
+				Parser parser = null;
+				if (varName.endsWith("*")) {
+					parser = includes.get("fuzzyWord");
+				} else {
+					parser = includes.get(varName);
+				}
 				if (parser == null) {
 					throw new Exception(token + " is not exsit!");
 				}
-				parsers.add(new NamedParser(varName, parser));
+				if (varName.endsWith("*")) {
+					// 解析通配变量
+					if (size == 1 || i == size - 1) {
+						// 集合内只有一个通配变量或者通配变量是最后一个元素时设置为无约束通配
+						parsers.add(new NamedParser(varName, new OneOrMany(parser)));
+					} else {
+						// 根据条件计算通配字符串的长度
+						if (i == 0) {
+							// 当通配变量为第一个元素时，start不变并为0
+							String afterStr = tokens.get(i + 1);
+							end = lang.indexOf(afterStr, end);
+						} else {
+							// 当通配变量位于中间位置时，获取前面的字符串计算start，并获取后面得字符串计算end
+							String beforeStr = tokens.get(i - 1);
+							String afterStr = tokens.get(i + 1);
+							start = lang.indexOf(beforeStr, start) + beforeStr.length();
+							end = lang.indexOf(afterStr, end);
+						}
+						parsers.add(new NamedParser(varName, new OneOrMany(end - start, parser)));
+					}
+				} else {
+					parsers.add(new NamedParser(varName, parser));
+				}
 			} else {
 				parsers.add(new WORD(token));
 			}

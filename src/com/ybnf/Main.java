@@ -3,18 +3,9 @@ package com.ybnf;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.ansj.domain.Result;
-import org.ansj.library.DicLibrary;
-import org.ansj.recognition.impl.UserDicNatureRecognition;
-import org.ansj.splitWord.analysis.IndexAnalysis;
-import org.nlpcn.commons.lang.tire.domain.Forest;
-import org.nlpcn.commons.lang.tire.domain.Value;
-import org.nlpcn.commons.lang.tire.library.Library;
-
-import com.ybnf.compiler.lucene.RegexRecognition;
+import com.ybnf.dsl.DslService;
 
 class U {
 	private String service;
@@ -57,20 +48,9 @@ public class Main {
 		System.out.println(r);
 
 		long start = System.currentTimeMillis();
-		Forest forest = DicLibrary.get();
-		for (int i = 0; i < 10; i++) {
-			Library.insertWord(forest, new Value("" + i, "num", "1"));
-		}
-		Library.insertWord(forest, new Value("分钟", "q", "1"));
-		Map<String, String[]> m = forest.toMap();
-		for (Entry<String, String[]> e : m.entrySet()) {
-			System.out.println(e.getKey() + ":" + e.getValue()[0] + " - " + e.getValue()[1]);
-		}
-		Result res = IndexAnalysis.parse("前进一千二百零三万九千三百八十四分钟", forest);
-		new RegexRecognition("\\d+(\\.\\d+){0,1}", "num").recognition(res);
-		new RegexRecognition("((零|一|二|三|四|五|六|七|八|九|十)(十|百|千|万|亿|兆)*)+", "num").recognition(res);
-		new UserDicNatureRecognition(forest).recognition(res);
-		System.out.println(res);
+		DslService service = new DslService();
+		Object o = service.compile("记住你叫 $name* 喔", "记住你叫小勇喔");
+		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);
 	}
 }

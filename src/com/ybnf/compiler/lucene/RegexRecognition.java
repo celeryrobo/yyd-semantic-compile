@@ -11,7 +11,7 @@ import org.ansj.domain.Term;
 import org.ansj.recognition.Recognition;
 
 public class RegexRecognition implements Recognition {
-	private static final long serialVersionUID = -5199218058623030410L;
+	private static final long serialVersionUID = 1L;
 	private Pattern pattern;
 	private Nature nature;
 
