@@ -24,6 +24,15 @@ public class Template {
 			String word = tokenizer.nextToken();
 			if (word.startsWith("$")) {
 				String varName = word.substring(1);
+				int length = varName.length();
+				switch (varName.substring(length - 1)) {
+				case "*":
+				case "+":
+					varName = varName.substring(0, length - 1);
+				default:
+					varTypes.add(varName);
+					break;
+				}
 				varTypes.add(varName);
 				if (MyStaticValue.ENV.containsKey(varName)) {
 					entTypes.add(varName);
