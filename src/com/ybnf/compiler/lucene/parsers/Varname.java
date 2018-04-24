@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import com.ybnf.compiler.lucene.TemplateBuilder;
 
 public class Varname extends Node<Node<?>> {
-	private static final Pattern PATTERN = Pattern.compile("\\w+");
+	private static final Pattern PATTERN = Pattern.compile("\\w+[\\*\\+]{0,1}");
 
 	public Varname(Node<?> node) {
 		StringBuilder sb = new StringBuilder();
