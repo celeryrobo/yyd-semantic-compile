@@ -3,8 +3,6 @@ package com.ybnf;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.ybnf.expr.ExprService;
@@ -51,15 +49,8 @@ public class Main {
 
 		long start = System.currentTimeMillis();
 		ExprService service = new ExprService();
-		Object o = service.compile("记住你叫 $name* $num*", "记住你叫小勇喔");
+		Object o = service.compile("记住你叫 $name+ $num+", "你要记住你叫小勇喔");
 		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);
-		
-		Matcher matcher = Pattern.compile("记住你叫(.+)(.+)").matcher("记住你叫小勇喔");
-		if(matcher.find()) {
-			System.out.println(matcher.group());
-			System.out.println(matcher.group(1));
-			System.out.println(matcher.group(2));
-		}
 	}
 }

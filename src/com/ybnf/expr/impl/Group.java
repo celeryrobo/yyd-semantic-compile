@@ -13,7 +13,7 @@ public class Group implements Expr {
 
 	@Override
 	public String expr() {
-		StringBuilder sb = new StringBuilder("(").append(first.expr());
+		StringBuilder sb = new StringBuilder("(?:").append(first.expr());
 		for (Expr expr : exprs) {
 			sb.append(expr.expr());
 		}
