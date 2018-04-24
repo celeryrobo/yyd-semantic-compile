@@ -3,9 +3,11 @@ package com.ybnf;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.ybnf.dsl.DslService;
+import com.ybnf.expr.ExprService;
 
 class U {
 	private String service;
@@ -48,9 +50,16 @@ public class Main {
 		System.out.println(r);
 
 		long start = System.currentTimeMillis();
-		DslService service = new DslService();
-		Object o = service.compile("记住你叫 $name* 喔", "记住你叫小勇喔");
+		ExprService service = new ExprService();
+		Object o = service.compile("记住你叫 $name* $num*", "记住你叫小勇喔");
 		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);
+		
+		Matcher matcher = Pattern.compile("记住你叫(.+)(.+)").matcher("记住你叫小勇喔");
+		if(matcher.find()) {
+			System.out.println(matcher.group());
+			System.out.println(matcher.group(1));
+			System.out.println(matcher.group(2));
+		}
 	}
 }

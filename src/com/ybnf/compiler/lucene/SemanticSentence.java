@@ -7,10 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.ansj.domain.Result;
 import org.ansj.library.DicLibrary;
@@ -24,13 +21,12 @@ import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.nlpcn.commons.lang.tire.domain.Forest;
-import org.nlpcn.commons.lang.util.StringUtil;
 
 import com.ybnf.compiler.beans.YbnfCompileResult;
-import com.ybnf.dsl.DslService;
-import com.ybnf.dsl.parser.Parser;
-import com.ybnf.dsl.parser.impl.ORR;
-import com.ybnf.dsl.parser.impl.WORD;
+import com.ybnf.expr.Expr;
+import com.ybnf.expr.ExprService;
+import com.ybnf.expr.impl.Or;
+import com.ybnf.expr.impl.Word;
 
 public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
@@ -50,7 +46,7 @@ public class SemanticSentence {
 	private Set<String> varTypes;
 	private List<String> keywords;
 	private List<String> sentences;
-	private DslService dsl;
+	private ExprService dsl;
 
 	public SemanticSentence(String service, String lang, Set<String> entTypes, Set<String> varTypes) {
 		this.lang = lang;
@@ -114,27 +110,27 @@ public class SemanticSentence {
 	}
 
 	private void initDslService() {
-		dsl = new DslService();
+		dsl = new ExprService();
 		if (sentences.isEmpty()) {
 			return;
 		}
-		Parser parser = null;
+		Expr parser = null;
 		int size = sentences.size();
 		switch (size) {
 		case 1: {
-			parser = new WORD(sentences.get(0));
+			parser = new Word(sentences.get(0));
 			break;
 		}
 		case 2: {
-			parser = new ORR(new WORD(sentences.get(0)), new WORD(sentences.get(1)));
+			parser = new Or(new Word(sentences.get(0)), new Word(sentences.get(1)));
 			break;
 		}
 		default: {
-			Parser[] arr = new Parser[size - 2];
+			Expr[] arr = new Expr[size - 2];
 			for (int i = 0; i < arr.length; i++) {
-				arr[i] = new WORD(sentences.get(i + 2));
+				arr[i] = new Word(sentences.get(i + 2));
 			}
-			parser = new ORR(new WORD(sentences.get(0)), new WORD(sentences.get(1)), arr);
+			parser = new Or(new Word(sentences.get(0)), new Word(sentences.get(1)), arr);
 			break;
 		}
 		}
@@ -154,26 +150,6 @@ public class SemanticSentence {
 
 	public List<String> getKeywords() {
 		return keywords;
-	}
-
-	private String buildSentence(String text, String template) throws Exception {
-		StringBuilder regexBuilder = new StringBuilder();
-		StringTokenizer tokenizer = new StringTokenizer(template, " ");
-		String sentence = StringUtil.joiner(sentences, "|");
-		while (tokenizer.hasMoreTokens()) {
-			String token = tokenizer.nextToken();
-			if (token.startsWith("$")) {
-				regexBuilder.append("(").append(sentence).append(")");
-			} else {
-				regexBuilder.append(token);
-			}
-		}
-		LOG.info("Regex : " + regexBuilder);
-		Matcher matcher = Pattern.compile(regexBuilder.toString()).matcher(text);
-		if (matcher.find()) {
-			return matcher.group();
-		}
-		throw new Exception("Semantic Match Failture !");
 	}
 
 	public Query buildQuery(String fieldName) {
@@ -198,12 +174,11 @@ public class SemanticSentence {
 	}
 
 	public YbnfCompileResult compile(String template) throws Exception {
-		String sentence = buildSentence(lang, template);
 		Map<String, String> slots = new HashMap<>();
 		if (intent != null) {
 			slots.put("intent", intent);
 		}
-		Map<String, String> objects = dsl.compile(template, sentence);
+		Map<String, String> objects = dsl.compile(template, lang);
 		return new YbnfCompileResult(lang, "1.0", "UTF-8", service, objects, slots);
 	}
 
