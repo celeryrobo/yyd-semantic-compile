@@ -25,12 +25,16 @@ public class Many implements Expr {
 	public String expr() {
 		StringBuilder sb = new StringBuilder(new Group(expr).expr());
 		min = min < 0 ? 0 : min;
-		if (min == 0) {
-			sb.append("*");
-		} else if (min == max) {
-			sb.append("{").append(min).append("}");
+		if (min == max) {
+			if (min == 0) {
+				sb.append("*");
+			} else {
+				sb.append("{").append(min).append("}");
+			}
 		} else if (min > max) {
-			if (min == 1) {
+			if (min == 0) {
+				sb.append("*");
+			} else if (min == 1) {
 				sb.append("+");
 			} else {
 				sb.append("{").append(min).append("}");
