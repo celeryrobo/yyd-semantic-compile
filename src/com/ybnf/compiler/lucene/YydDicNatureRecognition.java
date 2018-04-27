@@ -16,8 +16,8 @@ public class YydDicNatureRecognition implements Recognition {
 	private static final Map<String, Recognition[]> RECOGNITIONS;
 	static {
 		RECOGNITIONS = new HashMap<>();
-		RECOGNITIONS.put("number", new Recognition[] { new RegexRecognition("\\d+(\\.\\d+){0,1}", "number"),
-				new RegexRecognition("((零|一|二|三|四|五|六|七|八|九|十)(十|百|千|万|亿|兆)*)+", "number") });
+		RECOGNITIONS.put("number", new Recognition[] { new RegexRecognition("\\d+(\\.\\d+){0,1}", "c:number"),
+				new RegexRecognition("((零|一|二|三|四|五|六|七|八|九|十)(十|百|千|万|亿|兆)*)+", "c:number") });
 	}
 	private UserDicNatureRecognition recognition;
 	private Forest[] forests;

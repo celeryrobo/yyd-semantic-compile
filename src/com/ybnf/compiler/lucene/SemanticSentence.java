@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -46,6 +47,7 @@ public class SemanticSentence {
 		this.types = new HashSet<>();
 		this.keywords = new LinkedList<>();
 		this.sentences = new ArrayList<>();
+		this.dsl = new ExprService();
 		Forest[] forests = new Forest[entTypes.size() + 2];
 		forests[0] = DicLibrary.get(); // 默认词库
 		forests[1] = DicLibrary.get("SRV" + service); // 当前场景内的关键词词库
@@ -54,7 +56,7 @@ public class SemanticSentence {
 			forests[i] = dics[i - 2];
 		}
 		initSentence(lang, forests);
-		initDslService();
+		initDslSentence(sentences);
 	}
 
 	private void initSentence(String lang, Forest... forests) {
@@ -92,9 +94,8 @@ public class SemanticSentence {
 		return terms;
 	}
 
-	private void initDslService() {
-		dsl = new ExprService();
-		if (sentences.isEmpty()) {
+	private void initDslSentence(List<String> sentences) {
+		if (Objects.isNull(sentences) || sentences.isEmpty()) {
 			return;
 		}
 		Expr parser = null;
