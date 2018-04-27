@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import org.ansj.domain.Result;
 import org.ansj.library.DicLibrary;
-import org.ansj.recognition.Recognition;
 import org.ansj.splitWord.analysis.IndexAnalysis;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -29,12 +28,6 @@ import com.ybnf.expr.impl.Word;
 
 public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
-	private static final Map<String, Recognition[]> RECOGNITIONS;
-	static {
-		RECOGNITIONS = new HashMap<>();
-		RECOGNITIONS.put("number", new Recognition[] { new RegexRecognition("\\d+(\\.\\d+){0,1}", "number"),
-				new RegexRecognition("((零|一|二|三|四|五|六|七|八|九|十)(十|百|千|万|亿|兆)*)+", "number") });
-	}
 	private String intent = "";
 	private String lang;
 	private String service;
@@ -66,15 +59,7 @@ public class SemanticSentence {
 
 	private void initSentence(String lang, Forest... forests) {
 		Result result = IndexAnalysis.parse(lang, forests);
-		for (String varType : varTypes) {
-			Recognition[] recognitions = RECOGNITIONS.get(varType);
-			if (recognitions != null) {
-				for (Recognition recognition : recognitions) {
-					recognition.recognition(result);
-				}
-			}
-		}
-		new YydDicNatureRecognition(forests).recognition(result);
+		new YydDicNatureRecognition(varTypes, forests).recognition(result);
 		LOG.info(result.toString());
 		List<org.ansj.domain.Term> terms = filterTerms(lang, result);
 		LOG.info(terms.toString());
