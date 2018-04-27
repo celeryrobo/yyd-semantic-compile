@@ -55,10 +55,9 @@ public class ExprService {
 		return this;
 	}
 
-	public Map<String, String> compile(String template, String lang) throws Exception {
+	private String buildRegexExpr(String template, List<String> varNames) throws Exception {
 		List<Expr> parsers = new ArrayList<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
-		List<String> varNames = new ArrayList<>();
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (token.startsWith("$")) {
@@ -92,7 +91,12 @@ public class ExprService {
 		for (int i = 0; i < arr.length; i++) {
 			arr[i] = parsers.get(i + 1);
 		}
-		String regex = new Group(first, arr).expr();
+		return new Group(first, arr).expr();
+	}
+
+	public Map<String, String> compile(String template, String lang) throws Exception {
+		List<String> varNames = new ArrayList<>();
+		String regex = buildRegexExpr(template, varNames);
 		LOG.info("REGEX: " + regex);
 		return parse(regex, lang, varNames);
 	}

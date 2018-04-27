@@ -1,22 +1,29 @@
 package com.ybnf.compiler.lucene;
 
+import java.util.Collection;
 import java.util.Map;
 
+import org.ansj.library.DicLibrary;
 import org.ansj.lucene7.AnsjAnalyzer;
 import org.ansj.lucene7.AnsjAnalyzer.TYPE;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.nlpcn.commons.lang.tire.domain.Forest;
+import org.nlpcn.commons.lang.util.StringUtil;
 
 public class IndexWriterService extends LuceneService {
-	private static Analyzer analyzer = new AnsjAnalyzer(TYPE.dic_ansj);
 	private IndexWriter writer;
 
-	public IndexWriterService() throws Exception {
+	public IndexWriterService(Collection<String> dics) throws Exception {
+		for (String dic : dics) {
+			DicLibrary.put(dic, "", new Forest());
+		}
+		Analyzer analyzer = new AnsjAnalyzer(TYPE.dic_ansj, StringUtil.joiner(dics, ","));
 		IndexWriterConfig cfg = new IndexWriterConfig(analyzer);
 		writer = new IndexWriter(directory, cfg);
 	}

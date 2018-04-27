@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import org.ansj.domain.Result;
 import org.ansj.library.DicLibrary;
 import org.ansj.recognition.Recognition;
-import org.ansj.recognition.impl.UserDicNatureRecognition;
 import org.ansj.splitWord.analysis.IndexAnalysis;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -33,10 +32,8 @@ public class SemanticSentence {
 	private static final Map<String, Recognition[]> RECOGNITIONS;
 	static {
 		RECOGNITIONS = new HashMap<>();
-		RECOGNITIONS.put("number", new Recognition[] {
-			new RegexRecognition("\\d+(\\.\\d+){0,1}", "number"),
-			new RegexRecognition("((零|一|二|三|四|五|六|七|八|九|十)(十|百|千|万|亿|兆)*)+", "number")
-		});
+		RECOGNITIONS.put("number", new Recognition[] { new RegexRecognition("\\d+(\\.\\d+){0,1}", "number"),
+				new RegexRecognition("((零|一|二|三|四|五|六|七|八|九|十)(十|百|千|万|亿|兆)*)+", "number") });
 	}
 	private String intent = "";
 	private String lang;
@@ -56,11 +53,12 @@ public class SemanticSentence {
 		this.types = new HashSet<>();
 		this.keywords = new LinkedList<>();
 		this.sentences = new ArrayList<>();
-		Forest[] forests = new Forest[entTypes.size() + 1];
-		forests[0] = DicLibrary.get();
+		Forest[] forests = new Forest[entTypes.size() + 2];
+		forests[0] = DicLibrary.get(); // 默认词库
+		forests[1] = DicLibrary.get("SRV" + service); // 当前场景内的关键词词库
 		Forest[] dics = DicLibrary.gets(this.entTypes);
-		for (int i = 1; i < forests.length; i++) {
-			forests[i] = dics[i - 1];
+		for (int i = 2; i < forests.length; i++) {
+			forests[i] = dics[i - 2];
 		}
 		initSentence(lang, forests);
 		initDslService();
@@ -76,7 +74,7 @@ public class SemanticSentence {
 				}
 			}
 		}
-		new UserDicNatureRecognition(forests).recognition(result);
+		new YydDicNatureRecognition(forests).recognition(result);
 		LOG.info(result.toString());
 		List<org.ansj.domain.Term> terms = filterTerms(lang, result);
 		LOG.info(terms.toString());

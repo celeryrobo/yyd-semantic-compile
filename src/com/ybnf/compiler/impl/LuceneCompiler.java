@@ -1,6 +1,7 @@
 package com.ybnf.compiler.impl;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,7 +28,12 @@ public class LuceneCompiler implements ICompiler {
 		if (sceneIntentTemplates == null) {
 			return;
 		}
-		try (IndexWriterService writerService = new IndexWriterService()) {
+		List<String> dics = new LinkedList<>();
+		dics.add("dic");
+		for (String service : sceneIntentTemplates.keySet()) {
+			dics.add("SRV" + service);
+		}
+		try (IndexWriterService writerService = new IndexWriterService(dics)) {
 			services = new HashMap<>();
 			for (Entry<String, Map<String, List<String>>> sceneIntentTemplate : sceneIntentTemplates.entrySet()) {
 				String sceneName = sceneIntentTemplate.getKey();

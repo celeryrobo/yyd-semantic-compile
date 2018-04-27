@@ -25,7 +25,7 @@ public class SemanticService {
 	public SemanticIntent buildIntent(String intentName) {
 		SemanticIntent intent = intents.get(intentName);
 		if (intent == null) {
-			intent = new SemanticIntent(intentName);
+			intent = new SemanticIntent(name, intentName);
 			intents.put(intentName, intent);
 		}
 		return intent;

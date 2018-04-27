@@ -15,11 +15,11 @@ public class SemanticIntent {
 	private Set<Template> templates;
 	private Forest forest;
 
-	SemanticIntent(String name) {
+	SemanticIntent(String service, String name) {
 		this.name = name;
 		this.entTypes = new HashSet<>();
 		this.varTypes = new HashSet<>();
-		this.forest = DicLibrary.get();
+		this.forest = DicLibrary.get("SRV" + service);
 		resetTemplates();
 	}
 
