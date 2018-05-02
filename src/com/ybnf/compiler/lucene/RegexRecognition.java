@@ -12,6 +12,7 @@ import org.ansj.recognition.Recognition;
 
 public class RegexRecognition implements Recognition {
 	private static final long serialVersionUID = 1L;
+	private static final Nature TMP_NATURE = new Nature("tmp");
 	private Pattern pattern;
 	private Nature nature;
 
@@ -25,6 +26,10 @@ public class RegexRecognition implements Recognition {
 		List<Term> regexTerms = new ArrayList<>();
 		List<Term> terms = result.getTerms();
 		for (Term term : terms) {
+			if("kv".equals(term.getNatureStr())) {
+				regexTerms.add(term);
+				continue;
+			}
 			String realName = term.getRealName();
 			Matcher matcher = pattern.matcher(realName);
 			if (matcher.find()) {
@@ -33,7 +38,7 @@ public class RegexRecognition implements Recognition {
 				Term tm = null;
 				if (start != 0) {
 					tm = new Term(realName.substring(0, start), term.getOffe(), term.item());
-					tm.setNature(new Nature("tmp"));
+					tm.setNature(TMP_NATURE);
 					regexTerms.add(tm);
 				}
 				tm = new Term(matcher.group(), term.getOffe() + start, term.item());
@@ -41,7 +46,7 @@ public class RegexRecognition implements Recognition {
 				regexTerms.add(tm);
 				if (end != realName.length()) {
 					tm = new Term(realName.substring(end), term.getOffe() + end, term.item());
-					tm.setNature(new Nature("tmp"));
+					tm.setNature(TMP_NATURE);
 					regexTerms.add(tm);
 				}
 			} else {
