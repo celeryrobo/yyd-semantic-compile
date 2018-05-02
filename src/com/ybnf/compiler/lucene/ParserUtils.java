@@ -1,5 +1,6 @@
 package com.ybnf.compiler.lucene;
 
+import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
@@ -10,6 +11,12 @@ import com.ybnf.compiler.lucene.parsers.Or;
 import com.ybnf.compiler.lucene.parsers.Sent;
 import com.ybnf.compiler.lucene.parsers.Text;
 import com.ybnf.compiler.lucene.parsers.Varname;
+import com.ybnf.expr.Expr;
+import com.ybnf.expr.impl.NamedGroup;
+import com.ybnf.expr.impl.OneOrMany;
+import com.ybnf.expr.impl.Selectable;
+import com.ybnf.expr.impl.Word;
+import com.ybnf.expr.impl.ZeroOrMany;
 
 public class ParserUtils {
 	private static final Text CHOICES_LEFT = new Text("[");
@@ -94,6 +101,100 @@ public class ParserUtils {
 		default:
 			return new Text(token);
 		}
+	}
+	
+	public static Expr generate(String template, Map<String, Expr> includes) throws Exception {
+		Stack<Expr> stacks = new Stack<>();
+		StringTokenizer tokenizer = new StringTokenizer(template, "()[]|$*+ ", true);
+		while (tokenizer.hasMoreTokens()) {
+			tplParse(stacks, tokenizer, includes);
+		}
+		return tplBuilder(stacks);
+	}
+	
+	private static Expr tplBuilder(Stack<Expr> stack) {
+		int size = stack.size();
+		switch (size) {
+		case 0:
+			return null;
+		case 1:
+			return stack.get(0);
+		case 2:
+			return new com.ybnf.expr.impl.Group(stack.get(0), stack.get(1));
+		default: {
+			Expr[] exprs = new Expr[size - 1];
+			for (int i = 1; i < size; i++) {
+				exprs[i - 1] = stack.get(i);
+			}
+			return new com.ybnf.expr.impl.Group(stack.get(0), exprs);
+		}
+		}
+	}
+	
+	private static String tplParse(Stack<Expr> stacks, StringTokenizer tokenizer, Map<String, Expr> includes)
+			throws Exception {
+		String token = tokenizer.nextToken();
+		switch (token) {
+		case "|":
+			if (tokenizer.hasMoreTokens()) {
+				tplParse(stacks, tokenizer, includes);
+				Expr second = stacks.pop();
+				Expr first = stacks.pop();
+				stacks.push(new com.ybnf.expr.impl.Group(new com.ybnf.expr.impl.Or(first, second)));
+				break;
+			}
+			throw new Exception("or parser error");
+		case "$":
+			if (tokenizer.hasMoreTokens()) {
+				String varName = tokenizer.nextToken();
+				Expr expr = includes.get(varName);
+				if (expr == null) {
+					throw new Exception("var " + varName + " is not exsit");
+				}
+				stacks.push(new NamedGroup(varName, expr));
+				break;
+			}
+			throw new Exception("var parser error");
+		case "[": {
+			Stack<Expr> tmpStacks = new Stack<>();
+			while (tokenizer.hasMoreTokens()) {
+				String tmpToken = tplParse(tmpStacks, tokenizer, includes);
+				if ("]".equals(tmpToken)) {
+					stacks.push(new Selectable(tplBuilder(tmpStacks)));
+					return token;
+				}
+			}
+			throw new Exception("selectable parser error");
+		}
+		case "(": {
+			Stack<Expr> tmpStacks = new Stack<>();
+			while (tokenizer.hasMoreTokens()) {
+				String tmpToken = tplParse(tmpStacks, tokenizer, includes);
+				if (")".equals(tmpToken)) {
+					Expr expr = tplBuilder(tmpStacks);
+					stacks.push(expr instanceof com.ybnf.expr.impl.Group ? expr : new com.ybnf.expr.impl.Group(expr));
+					return token;
+				}
+			}
+			throw new Exception("group parser error");
+		}
+		case "*": {
+			stacks.push(new ZeroOrMany(stacks.pop()));
+			break;
+		}
+		case "+": {
+			stacks.push(new OneOrMany(stacks.pop()));
+			break;
+		}
+		case " ":
+		case "]":
+		case ")":
+			break;
+		default:
+			stacks.push(new Word(token));
+			break;
+		}
+		return token;
 	}
 
 	public static float distanceScore(String sourceStr, String targetStr) {

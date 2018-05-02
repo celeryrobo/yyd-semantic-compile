@@ -71,6 +71,8 @@ public class SemanticSentence {
 			sentences.add(name);
 			if ("kv".equals(natureStr)) {
 				keywords.add(name);
+			} else if (natureStr.startsWith("c:")) {
+				types.add(natureStr.substring(2));
 			}
 		}
 	}
@@ -80,15 +82,11 @@ public class SemanticSentence {
 		int totalSize = 0, curSize = 0, curIndex = 0;
 		for (org.ansj.domain.Term term : result) {
 			String realName = term.getRealName();
-			String natureStr = term.getNatureStr();
 			curIndex = lang.indexOf(realName, totalSize - curSize - 1);
 			if (curIndex >= totalSize) {
 				curSize = realName.length();
 				totalSize += curSize;
 				terms.add(term);
-			}
-			if (natureStr.startsWith("c:")) {
-				types.add(natureStr.substring(2));
 			}
 		}
 		return terms;

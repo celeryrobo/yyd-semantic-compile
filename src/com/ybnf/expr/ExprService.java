@@ -9,14 +9,13 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.ybnf.compiler.lucene.ParserUtils;
 import com.ybnf.expr.impl.Group;
-import com.ybnf.expr.impl.NamedGroup;
 import com.ybnf.expr.impl.OneOrMany;
 import com.ybnf.expr.impl.Or;
 import com.ybnf.expr.impl.Regex;
 import com.ybnf.expr.impl.Selectable;
 import com.ybnf.expr.impl.Word;
-import com.ybnf.expr.impl.ZeroOrMany;
 
 public class ExprService {
 	private static final Logger LOG = Logger.getLogger(ExprService.class.getSimpleName());
@@ -55,48 +54,30 @@ public class ExprService {
 		return this;
 	}
 
-	private String buildRegexExpr(String template, List<String> varNames) throws Exception {
-		List<Expr> parsers = new ArrayList<>();
+	public Map<String, String> compile(String template, String lang) throws Exception {
+		List<String> varNames = new ArrayList<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (token.startsWith("$")) {
 				String varName = token.substring(1);
-				Expr parser = null;
-				int length = varName.length();
-				switch (varName.substring(length - 1)) {
-				case "*":
-					parser = new ZeroOrMany(includes.get("fuzzyWord"));
-					varName = varName.substring(0, length - 1);
-					break;
+				int nameLength = varName.length();
+				switch (varName.substring(nameLength - 1)) {
 				case "+":
-					parser = new OneOrMany(includes.get("fuzzyWord"));
-					varName = varName.substring(0, length - 1);
-					break;
+				case "*":
+					varName = varName.substring(0, nameLength - 1);
+					includes.put(varName, new Regex(".+"));
 				default:
-					parser = includes.get(varName);
+					varNames.add(varName);
 					break;
 				}
-				if (parser == null) {
-					throw new Exception(token + " is not exsit!");
-				}
-				parsers.add(new NamedGroup(varName, parser));
-				varNames.add(varName);
-			} else {
-				parsers.add(new Word(token));
 			}
 		}
-		Expr[] arr = new Expr[parsers.size() - 1];
-		Expr first = parsers.get(0);
-		for (int i = 0; i < arr.length; i++) {
-			arr[i] = parsers.get(i + 1);
+		Expr expr = ParserUtils.generate(template, includes);
+		String regex = null;
+		if (expr != null) {
+			regex = expr.expr();
 		}
-		return new Group(first, arr).expr();
-	}
-
-	public Map<String, String> compile(String template, String lang) throws Exception {
-		List<String> varNames = new ArrayList<>();
-		String regex = buildRegexExpr(template, varNames);
 		LOG.info("REGEX: " + regex);
 		return parse(regex, lang, varNames);
 	}

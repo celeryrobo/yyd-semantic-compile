@@ -26,7 +26,8 @@ public class RegexRecognition implements Recognition {
 		List<Term> regexTerms = new ArrayList<>();
 		List<Term> terms = result.getTerms();
 		for (Term term : terms) {
-			if("kv".equals(term.getNatureStr())) {
+			// 分词后为关键词词性则不再进行分词
+			if ("kv".equals(term.getNatureStr())) {
 				regexTerms.add(term);
 				continue;
 			}
