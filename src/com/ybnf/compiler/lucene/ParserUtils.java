@@ -1,5 +1,6 @@
 package com.ybnf.compiler.lucene;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
@@ -112,7 +113,7 @@ public class ParserUtils {
 		return tplBuilder(stacks);
 	}
 	
-	private static Expr tplBuilder(Stack<Expr> stack) {
+	private static Expr tplBuilder(List<Expr> stack) {
 		int size = stack.size();
 		switch (size) {
 		case 0:

@@ -20,12 +20,11 @@ import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.nlpcn.commons.lang.tire.domain.Forest;
+import org.nlpcn.commons.lang.util.StringUtil;
 
 import com.ybnf.compiler.beans.YbnfCompileResult;
 import com.ybnf.expr.Expr;
 import com.ybnf.expr.ExprService;
-import com.ybnf.expr.impl.Or;
-import com.ybnf.expr.impl.Word;
 
 public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
@@ -96,28 +95,12 @@ public class SemanticSentence {
 		if (Objects.isNull(sentences) || sentences.isEmpty()) {
 			return;
 		}
-		Expr parser = null;
-		int size = sentences.size();
-		switch (size) {
-		case 1: {
-			parser = new Word(sentences.get(0));
-			break;
-		}
-		case 2: {
-			parser = new Or(new Word(sentences.get(0)), new Word(sentences.get(1)));
-			break;
-		}
-		default: {
-			Expr[] arr = new Expr[size - 2];
-			for (int i = 0; i < arr.length; i++) {
-				arr[i] = new Word(sentences.get(i + 2));
+		try {
+			Expr parser = ParserUtils.generate(StringUtil.joiner(sentences, "|"), null);
+			for (String type : types) {
+				dsl.include(type, parser);
 			}
-			parser = new Or(new Word(sentences.get(0)), new Word(sentences.get(1)), arr);
-			break;
-		}
-		}
-		for (String type : types) {
-			dsl.include(type, parser);
+		} catch (Exception e) {
 		}
 	}
 

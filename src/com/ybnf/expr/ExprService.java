@@ -74,10 +74,10 @@ public class ExprService {
 			}
 		}
 		Expr expr = ParserUtils.generate(template, includes);
-		String regex = null;
-		if (expr != null) {
-			regex = expr.expr();
+		if (expr == null) {
+			throw new Exception("Semantic Match Failture !");
 		}
+		String regex = expr.expr();
 		LOG.info("REGEX: " + regex);
 		return parse(regex, lang, varNames);
 	}
