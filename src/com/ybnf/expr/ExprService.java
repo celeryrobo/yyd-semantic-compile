@@ -26,7 +26,8 @@ public class ExprService {
 				new Word("五"), new Word("六"), new Word("七"), new Word("八"), new Word("九"), new Word("九"), new Word("十"),
 				new Word("百"), new Word("千"), new Word("万"), new Word("亿"), new Regex("\\d"));
 		number = new OneOrMany(number);
-		number = new Group(number, new Selectable(new Group(new Word("\\."), number)));
+		number = new Group(number,
+				new Selectable(new Group(new Group(new Or(new Word("点"), new Word("\\."))), number)));
 		DSL_INCLUDE_SERVICE.include("number", number);
 	}
 	private Map<String, Expr> includes;

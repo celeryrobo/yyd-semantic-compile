@@ -49,7 +49,7 @@ public class Main {
 
 		long start = System.currentTimeMillis();
 		ExprService service = new ExprService();
-		Object o = service.compile("记住你叫 $name+ $num+", "你要记住你叫小勇喔");
+		Map<String, String> o = service.compile("$number", "十二点五六");
 		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);
 	}
