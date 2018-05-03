@@ -16,6 +16,7 @@ import org.ansj.splitWord.analysis.IndexAnalysis;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -71,7 +72,6 @@ public class SemanticSentence {
 			if ("kv".equals(natureStr)) {
 				keywords.add(name);
 			} else if (natureStr.startsWith("c:")) {
-				keywords.add(natureStr);
 				types.add(natureStr.substring(2));
 			}
 		}
@@ -114,30 +114,21 @@ public class SemanticSentence {
 		if (keywords.isEmpty() && varTypes.isEmpty()) {
 			return null;
 		}
-		Set<String> categories = new HashSet<>();
 		BooleanQuery.Builder booleanBuilder = new BooleanQuery.Builder();
 		if (!keywords.isEmpty()) {
 			PhraseQuery.Builder phraseBuilder = new PhraseQuery.Builder();
 			phraseBuilder.setSlop(5);
 			int idx = 0;
 			for (String keyword : keywords) {
-				if (keyword.startsWith("c:")) {
-					String category = keyword.substring(2);
-					if (category.endsWith("+") || category.endsWith("*")) {
-						category = category.substring(0, category.length() - 1);
-					}
-					if (!categories.contains(category)) {
-						categories.add(category);
-						phraseBuilder.add(new Term("template", category.toLowerCase()), idx++);
-					}
-				} else {
-					phraseBuilder.add(new Term("template", keyword), idx++);
-				}
+				phraseBuilder.add(new Term("template", keyword), idx++);
 			}
 			booleanBuilder.add(phraseBuilder.build(), Occur.MUST);
 		}
 		for (String type : varTypes) {
-			if (!categories.contains(type)) {
+			if (types.contains(type)) {
+				booleanBuilder.add(new BoostQuery(new TermQuery(new Term("template", type.toLowerCase())), 4.0F),
+						Occur.SHOULD);
+			} else {
 				booleanBuilder.add(new TermQuery(new Term("template", type.toLowerCase())), Occur.SHOULD);
 			}
 		}

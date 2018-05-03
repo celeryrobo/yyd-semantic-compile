@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.nlpcn.commons.lang.util.StringUtil;
-
 import com.ybnf.expr.ExprService;
 
 class U {
@@ -54,7 +52,5 @@ public class Main {
 		Object o = service.compile("记住你叫 $name+ $num+", "你要记住你叫小勇喔");
 		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);
-		
-		System.out.println(StringUtil.isBlank(""));
 	}
 }
