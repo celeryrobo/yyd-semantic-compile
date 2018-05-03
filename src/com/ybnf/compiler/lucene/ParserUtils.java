@@ -103,7 +103,7 @@ public class ParserUtils {
 			return new Text(token);
 		}
 	}
-	
+
 	public static Expr generate(String template, Map<String, Expr> includes) throws Exception {
 		Stack<Expr> stacks = new Stack<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, "()[]|$*+ ", true);
@@ -112,7 +112,7 @@ public class ParserUtils {
 		}
 		return tplBuilder(stacks);
 	}
-	
+
 	private static Expr tplBuilder(List<Expr> stack) {
 		int size = stack.size();
 		switch (size) {
@@ -131,7 +131,7 @@ public class ParserUtils {
 		}
 		}
 	}
-	
+
 	private static String tplParse(Stack<Expr> stacks, StringTokenizer tokenizer, Map<String, Expr> includes)
 			throws Exception {
 		String token = tokenizer.nextToken();
@@ -173,7 +173,10 @@ public class ParserUtils {
 				String tmpToken = tplParse(tmpStacks, tokenizer, includes);
 				if (")".equals(tmpToken)) {
 					Expr expr = tplBuilder(tmpStacks);
-					stacks.push(expr instanceof com.ybnf.expr.impl.Group ? expr : new com.ybnf.expr.impl.Group(expr));
+					if (!(expr instanceof com.ybnf.expr.impl.Group)) {
+						expr = new com.ybnf.expr.impl.Group(expr);
+					}
+					stacks.push(expr);
 					return token;
 				}
 			}

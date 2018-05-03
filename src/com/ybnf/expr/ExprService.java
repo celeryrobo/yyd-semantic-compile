@@ -27,9 +27,7 @@ public class ExprService {
 				new Word("百"), new Word("千"), new Word("万"), new Word("亿"), new Regex("\\d"));
 		number = new OneOrMany(number);
 		number = new Group(number, new Selectable(new Group(new Word("\\."), number)));
-		Expr fuzzyWord = new Regex(".");
 		DSL_INCLUDE_SERVICE.include("number", number);
-		DSL_INCLUDE_SERVICE.include("fuzzyWord", fuzzyWord);
 	}
 	private Map<String, Expr> includes;
 
@@ -66,7 +64,9 @@ public class ExprService {
 				case "+":
 				case "*":
 					varName = varName.substring(0, nameLength - 1);
-					includes.put(varName, new Regex(".+"));
+					if (!includes.containsKey(varName)) {
+						includes.put(varName, new Regex(".+"));
+					}
 				default:
 					varNames.add(varName);
 					break;
