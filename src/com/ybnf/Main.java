@@ -1,13 +1,12 @@
 package com.ybnf;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.ybnf.compiler.lucene.ParserUtils;
-import com.ybnf.expr.Expr;
+import org.nlpcn.commons.lang.util.StringUtil;
+
 import com.ybnf.expr.ExprService;
 
 class U {
@@ -56,9 +55,6 @@ public class Main {
 		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);
 		
-		Map<String, Expr> includes = new HashMap<>();
-		includes.put("singer", ParserUtils.generate("刘德华|张学友|黎明|郭富城", includes));
-		includes.put("song", ParserUtils.generate("冰雨|饿狼传说", includes));
-		System.out.println(ParserUtils.generate("[我[想[听]]] $singer 的 $song", includes).expr());
+		System.out.println(StringUtil.isBlank(""));
 	}
 }

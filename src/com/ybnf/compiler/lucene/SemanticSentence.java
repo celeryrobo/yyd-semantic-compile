@@ -71,6 +71,7 @@ public class SemanticSentence {
 			if ("kv".equals(natureStr)) {
 				keywords.add(name);
 			} else if (natureStr.startsWith("c:")) {
+				keywords.add(natureStr);
 				types.add(natureStr.substring(2));
 			}
 		}
@@ -109,30 +110,36 @@ public class SemanticSentence {
 		return this;
 	}
 
-	public Set<String> getTypes() {
-		return types;
-	}
-
-	public List<String> getKeywords() {
-		return keywords;
-	}
-
-	public Query buildQuery(String fieldName) {
+	public Query buildQuery() {
 		if (keywords.isEmpty() && varTypes.isEmpty()) {
 			return null;
 		}
+		Set<String> categories = new HashSet<>();
 		BooleanQuery.Builder booleanBuilder = new BooleanQuery.Builder();
 		if (!keywords.isEmpty()) {
 			PhraseQuery.Builder phraseBuilder = new PhraseQuery.Builder();
 			phraseBuilder.setSlop(5);
 			int idx = 0;
 			for (String keyword : keywords) {
-				phraseBuilder.add(new Term(fieldName, keyword), idx++);
+				if (keyword.startsWith("c:")) {
+					String category = keyword.substring(2);
+					if (category.endsWith("+") || category.endsWith("*")) {
+						category = category.substring(0, category.length() - 1);
+					}
+					if (!categories.contains(category)) {
+						categories.add(category);
+						phraseBuilder.add(new Term("template", category.toLowerCase()), idx++);
+					}
+				} else {
+					phraseBuilder.add(new Term("template", keyword), idx++);
+				}
 			}
 			booleanBuilder.add(phraseBuilder.build(), Occur.MUST);
 		}
 		for (String type : varTypes) {
-			booleanBuilder.add(new TermQuery(new Term(fieldName, type.toLowerCase())), Occur.SHOULD);
+			if (!categories.contains(type)) {
+				booleanBuilder.add(new TermQuery(new Term("template", type.toLowerCase())), Occur.SHOULD);
+			}
 		}
 		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
 		return booleanBuilder.build();
