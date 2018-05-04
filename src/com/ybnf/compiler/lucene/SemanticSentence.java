@@ -31,7 +31,6 @@ import com.ybnf.expr.ExprService;
 public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
 	private String intent = "";
-	private Integer companyId = 0;
 	private String lang;
 	private String service;
 	private Set<String> types;
@@ -112,7 +111,7 @@ public class SemanticSentence {
 		return this;
 	}
 
-	public Query buildQuery() {
+	public Query buildQuery(Integer companyId) {
 		if (keywords.isEmpty() && varTypes.isEmpty()) {
 			return null;
 		}
@@ -135,8 +134,9 @@ public class SemanticSentence {
 			}
 		}
 		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
-		if (companyId > 0) {
-			booleanBuilder.add(new TermQuery(new Term("companyId", companyId.toString())), Occur.MUST);
+		if ("QA".equals(service)) {
+			String companyIdStr = companyId == null ? "0" : companyId.toString();
+			booleanBuilder.add(new TermQuery(new Term("companyId", companyIdStr)), Occur.MUST);
 		}
 		return booleanBuilder.build();
 	}
@@ -151,8 +151,8 @@ public class SemanticSentence {
 	}
 
 	public YbnfCompileResult compile(TemplateEntity templateEntity) throws Exception {
-		YbnfCompileResult result = intent(templateEntity.getIntent()).compile(templateEntity.getTemplate());
-		return new LuceneCompileResult(result, templateEntity);
+		return new LuceneCompileResult(intent(templateEntity.getIntent()).compile(templateEntity.getTemplate()),
+				templateEntity);
 	}
 
 	public YbnfCompileResult compile(List<TemplateEntity> templateEntities) throws Exception {

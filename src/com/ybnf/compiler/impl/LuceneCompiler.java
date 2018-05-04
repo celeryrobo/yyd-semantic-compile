@@ -22,6 +22,7 @@ import com.ybnf.semantic.SemanticCallable;
 public class LuceneCompiler implements ICompiler {
 	private static final Logger LOG = Logger.getLogger(LuceneCompiler.class.getSimpleName());
 	public static final Map<String, SemanticService> SERVICES = new HashMap<>();
+	private static final ThreadLocal<Integer> COMPANY_ID = new ThreadLocal<>();
 	private SemanticService semanticService = null;
 
 	public static void init(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
@@ -57,11 +58,15 @@ public class LuceneCompiler implements ICompiler {
 			throw new Exception("场景:" + service + "，不存在！");
 		}
 	}
+	
+	public void setCompanyId(Integer companyId) {
+		COMPANY_ID.set(companyId);
+	}
 
 	@Override
 	public YbnfCompileResult compile(String text) throws Exception {
 		SemanticSentence sentence = semanticService.buildSentence(text);
-		Query query = sentence.buildQuery();
+		Query query = sentence.buildQuery(COMPANY_ID.get());
 		LOG.info(query.toString());
 		List<TemplateEntity> entities = null;
 		try (IndexReaderService readerService = new IndexReaderService()) {
