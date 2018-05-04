@@ -40,11 +40,12 @@ public class IndexReaderService extends LuceneService {
 
 	private TemplateEntity buildTemplateEntity(ScoreDoc scoreDoc) throws Exception {
 		Document doc = searcher.doc(scoreDoc.doc);
+		Integer id = Integer.valueOf(doc.get("id"));
 		String service = doc.get("service");
 		String intent = doc.get("intent");
 		String template = doc.get("template");
 		float score = scoreDoc.score;
-		return new TemplateEntity(service, intent, template, score);
+		return new TemplateEntity(id, service, intent, template, score);
 	}
 
 	@Override

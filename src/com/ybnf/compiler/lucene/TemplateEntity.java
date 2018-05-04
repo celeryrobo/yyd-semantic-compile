@@ -1,20 +1,26 @@
 package com.ybnf.compiler.lucene;
 
 public class TemplateEntity {
+	private Integer id;
 	private String service;
 	private String intent;
 	private String template;
 	private float score;
 
-	public TemplateEntity(String service, String intent, String template) {
-		this(service, intent, template, 0);
+	public TemplateEntity(Integer id, String service, String intent, String template) {
+		this(id, service, intent, template, 0);
 	}
 
-	public TemplateEntity(String service, String intent, String template, float score) {
+	public TemplateEntity(Integer id, String service, String intent, String template, float score) {
+		this.id = id;
 		this.service = service;
 		this.intent = intent;
 		this.template = template;
 		this.score = score;
+	}
+	
+	public Integer getId() {
+		return id;
 	}
 
 	public String getService() {
@@ -36,6 +42,7 @@ public class TemplateEntity {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder("{");
+		builder.append("id=").append(id).append(", ");
 		builder.append("service=").append(service).append(", ");
 		builder.append("intent=").append(intent).append(", ");
 		builder.append("template=").append(template).append(", ");
