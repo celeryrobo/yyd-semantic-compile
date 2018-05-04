@@ -26,12 +26,12 @@ public class IndexWriterService extends LuceneService {
 		Analyzer analyzer = new AnsjAnalyzer(TYPE.dic_ansj, StringUtil.joiner(dics, ","));
 		IndexWriterConfig cfg = new IndexWriterConfig(analyzer);
 		writer = new IndexWriter(directory, cfg);
-		writer.deleteAll();
 	}
 
 	public void addTemplateEntity(TemplateEntity entity) throws Exception {
 		Document doc = new Document();
 		doc.add(new StringField("id", entity.getId().toString(), Store.YES));
+		doc.add(new StringField("companyId", entity.getCompanyId().toString(), Store.YES));
 		doc.add(new StringField("service", entity.getService(), Store.YES));
 		doc.add(new StringField("intent", entity.getIntent(), Store.YES));
 		doc.add(new TextField("template", entity.getTemplate(), Store.YES));
@@ -44,10 +44,14 @@ public class IndexWriterService extends LuceneService {
 		for (Map.Entry<String, SemanticIntent> entry : intents.entrySet()) {
 			String intentName = entry.getKey();
 			for (Template template : entry.getValue().getTemplates()) {
-				addTemplateEntity(new TemplateEntity(0, serviceName, intentName, template.getTemplate()));
+				addTemplateEntity(new TemplateEntity(0, 0, serviceName, intentName, template.getTemplate()));
 			}
 			entry.getValue().resetTemplates();
 		}
+	}
+	
+	public long deleteAll() throws Exception {
+		return writer.deleteAll();
 	}
 
 	@Override

@@ -23,6 +23,7 @@ import org.apache.lucene.search.TermQuery;
 import org.nlpcn.commons.lang.tire.domain.Forest;
 import org.nlpcn.commons.lang.util.StringUtil;
 
+import com.ybnf.compiler.beans.LuceneCompileResult;
 import com.ybnf.compiler.beans.YbnfCompileResult;
 import com.ybnf.expr.Expr;
 import com.ybnf.expr.ExprService;
@@ -30,6 +31,7 @@ import com.ybnf.expr.ExprService;
 public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
 	private String intent = "";
+	private Integer companyId = 0;
 	private String lang;
 	private String service;
 	private Set<String> types;
@@ -133,6 +135,9 @@ public class SemanticSentence {
 			}
 		}
 		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
+		if (companyId > 0) {
+			booleanBuilder.add(new TermQuery(new Term("companyId", companyId.toString())), Occur.MUST);
+		}
 		return booleanBuilder.build();
 	}
 
@@ -146,7 +151,8 @@ public class SemanticSentence {
 	}
 
 	public YbnfCompileResult compile(TemplateEntity templateEntity) throws Exception {
-		return intent(templateEntity.getIntent()).compile(templateEntity.getTemplate());
+		YbnfCompileResult result = intent(templateEntity.getIntent()).compile(templateEntity.getTemplate());
+		return new LuceneCompileResult(result, templateEntity);
 	}
 
 	public YbnfCompileResult compile(List<TemplateEntity> templateEntities) throws Exception {
