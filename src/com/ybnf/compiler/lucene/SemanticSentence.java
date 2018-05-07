@@ -118,7 +118,7 @@ public class SemanticSentence {
 		BooleanQuery.Builder booleanBuilder = new BooleanQuery.Builder();
 		if (!keywords.isEmpty()) {
 			PhraseQuery.Builder phraseBuilder = new PhraseQuery.Builder();
-			phraseBuilder.setSlop(5);
+			phraseBuilder.setSlop(5 * (keywords.size() - 1));
 			int idx = 0;
 			for (String keyword : keywords) {
 				phraseBuilder.add(new Term("template", keyword), idx++);
