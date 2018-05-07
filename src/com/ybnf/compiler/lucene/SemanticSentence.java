@@ -17,7 +17,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BoostQuery;
-import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.nlpcn.commons.lang.tire.domain.Forest;
@@ -116,14 +115,8 @@ public class SemanticSentence {
 			return null;
 		}
 		BooleanQuery.Builder booleanBuilder = new BooleanQuery.Builder();
-		if (!keywords.isEmpty()) {
-			PhraseQuery.Builder phraseBuilder = new PhraseQuery.Builder();
-			phraseBuilder.setSlop(5 * (keywords.size() - 1));
-			int idx = 0;
-			for (String keyword : keywords) {
-				phraseBuilder.add(new Term("template", keyword), idx++);
-			}
-			booleanBuilder.add(phraseBuilder.build(), Occur.MUST);
+		for (String keyword : keywords) {
+			booleanBuilder.add(new TermQuery(new Term("template", keyword)), Occur.MUST);
 		}
 		for (String type : varTypes) {
 			Query query = new TermQuery(new Term("template", type.toLowerCase()));
@@ -135,7 +128,7 @@ public class SemanticSentence {
 		}
 		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
 		if ("QA".equals(service)) {
-			String companyIdStr = companyId == null ? "0" : companyId.toString();
+			String companyIdStr = Objects.toString(companyId, "0");
 			booleanBuilder.add(new TermQuery(new Term("companyId", companyIdStr)), Occur.MUST);
 		}
 		return booleanBuilder.build();

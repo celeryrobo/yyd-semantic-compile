@@ -58,7 +58,7 @@ public class LuceneCompiler implements ICompiler {
 			throw new Exception("场景:" + service + "，不存在！");
 		}
 	}
-	
+
 	public void setCompanyId(Integer companyId) {
 		COMPANY_ID.set(companyId);
 	}
