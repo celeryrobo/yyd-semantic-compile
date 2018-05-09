@@ -1,6 +1,7 @@
 package com.ybnf.compiler.lucene;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -56,7 +57,7 @@ public class SemanticSentence {
 			forests[i] = dics[i - 2];
 		}
 		initSentence(lang, forests);
-		initDslSentence(sentences);
+		initDslSentence(types, sentences);
 	}
 
 	private void initSentence(String lang, Forest... forests) {
@@ -92,13 +93,13 @@ public class SemanticSentence {
 		return terms;
 	}
 
-	private void initDslSentence(List<String> sentences) {
+	private void initDslSentence(Collection<String> vars, Collection<String> sentences) {
 		if (Objects.isNull(sentences) || sentences.isEmpty()) {
 			return;
 		}
 		try {
 			Expr parser = ParserUtils.generate(StringUtil.joiner(sentences, "|"), null);
-			for (String type : types) {
+			for (String type : vars) {
 				dsl.include(type, parser);
 			}
 		} catch (Exception e) {

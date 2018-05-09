@@ -6,6 +6,7 @@ import java.util.Map;
 import org.ansj.library.DicLibrary;
 import org.ansj.lucene7.AnsjAnalyzer;
 import org.ansj.lucene7.AnsjAnalyzer.TYPE;
+import org.ansj.util.MyStaticValue;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
@@ -21,7 +22,9 @@ public class IndexWriterService extends LuceneService {
 
 	public IndexWriterService(Collection<String> dics) throws Exception {
 		for (String dic : dics) {
-			DicLibrary.put(dic, "", new Forest());
+			if (!MyStaticValue.ENV.containsKey(dic)) {
+				DicLibrary.put(dic, "", new Forest());
+			}
 		}
 		Analyzer analyzer = new AnsjAnalyzer(TYPE.dic_ansj, StringUtil.joiner(dics, ","));
 		IndexWriterConfig cfg = new IndexWriterConfig(analyzer);
@@ -49,7 +52,7 @@ public class IndexWriterService extends LuceneService {
 			entry.getValue().resetTemplates();
 		}
 	}
-	
+
 	public long deleteAll() throws Exception {
 		return writer.deleteAll();
 	}
