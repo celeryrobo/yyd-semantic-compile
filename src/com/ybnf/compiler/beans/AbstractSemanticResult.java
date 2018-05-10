@@ -51,6 +51,8 @@ public abstract class AbstractSemanticResult {
 	private String paramType = ParamType.T.toString();
 	@JsonIgnore
 	private Object resource = null;
+	@JsonIgnore
+	private Class<?> semanticClass = null;
 
 	public String getErrMsg() {
 		return errMsg;
@@ -103,5 +105,13 @@ public abstract class AbstractSemanticResult {
 
 	public void setResource(Object resource) {
 		this.resource = resource;
+	}
+
+	public Class<?> getSemanticClass() {
+		return semanticClass;
+	}
+
+	public void setSemanticClass(Class<?> semanticClass) {
+		this.semanticClass = semanticClass;
 	}
 }
