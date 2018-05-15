@@ -96,7 +96,7 @@ public abstract class AbstractSemanticResult {
 		for (ParamType type : paramTypes) {
 			sb.append(type);
 		}
-		this.paramType = sb.toString();
+		setParamType(sb.toString());
 	}
 
 	public Object getResource() {
