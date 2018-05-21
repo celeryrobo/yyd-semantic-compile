@@ -88,7 +88,12 @@ public class ExprService {
 		Map<String, String> map = new HashMap<>();
 		Matcher matcher = Pattern.compile(regex).matcher(lang);
 		if (matcher.find()) {
-			LOG.info("Sentence: " + matcher.group());
+			String sentence = matcher.group();
+			LOG.info("Sentence: " + sentence);
+			float score = ParserUtils.distanceScore(lang, sentence);
+			if(score < 0.5F) {
+				throw new Exception("Semantic Match Failture, Distance Score < 0.5!");
+			}
 			for (String varName : varNames) {
 				map.put(varName, matcher.group(varName));
 			}
