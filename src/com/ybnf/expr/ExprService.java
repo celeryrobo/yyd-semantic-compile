@@ -29,6 +29,8 @@ public class ExprService {
 		number = new Group(number,
 				new Selectable(new Group(new Group(new Or(new Word("点"), new Word("\\."))), number)));
 		DSL_INCLUDE_SERVICE.include("number", number);
+		DSL_INCLUDE_SERVICE.include("enChar", new Regex("\\w"));
+		DSL_INCLUDE_SERVICE.include("cnChar", new Regex("\\p{script=Han}"));
 	}
 	private Map<String, Expr> includes;
 
@@ -91,7 +93,7 @@ public class ExprService {
 			String sentence = matcher.group();
 			LOG.info("Sentence: " + sentence);
 			float score = ParserUtils.distanceScore(lang, sentence);
-			if(score < 0.5F) {
+			if (score < 0.5F) {
 				throw new Exception("Semantic Match Failture, Distance Score < 0.5!");
 			}
 			for (String varName : varNames) {
