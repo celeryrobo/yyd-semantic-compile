@@ -73,14 +73,11 @@ public class LuceneCompiler implements ICompiler {
 			entities = readerService.search(query);
 		}
 		LOG.info("TemplateEntity : ");
-		for (TemplateEntity entity : entities) {
-			LOG.info(entity.toString());
+		if (entities == null) {
+			return null;
 		}
-		YbnfCompileResult result = null;
-		if (entities != null) {
-			result = sentence.compile(entities);
-		}
-		return result;
+		entities.forEach(entity -> LOG.info(entity.toString()));
+		return sentence.compile(entities);
 	}
 
 	@Override
