@@ -1,6 +1,5 @@
 package com.ybnf.compiler.lucene;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +46,7 @@ public class SemanticSentence {
 		this.varTypes = varTypes;
 		this.types = new HashSet<>();
 		this.keywords = new LinkedList<>();
-		this.sentences = new ArrayList<>();
+		this.sentences = new LinkedList<>();
 		this.dsl = new ExprService();
 		Forest[] forests = new Forest[entTypes.size() + 2];
 		forests[0] = DicLibrary.get(); // 默认词库
@@ -64,37 +63,54 @@ public class SemanticSentence {
 		Result result = IndexAnalysis.parse(lang, forests);
 		new YydDicNatureRecognition(varTypes, forests).recognition(result);
 		LOG.info(result.toString());
-		List<org.ansj.domain.Term> terms = filterTerms(lang, result);
-		LOG.info(terms.toString());
-		for (org.ansj.domain.Term term : terms) {
+		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
-			sentences.add(name);
 			if ("kv".equals(natureStr)) {
 				keywords.add(name);
 			} else if (natureStr.startsWith("c:")) {
 				types.add(natureStr.substring(2));
 			}
 		}
-	}
-
-	private List<org.ansj.domain.Term> filterTerms(String lang, Result result) {
-		List<org.ansj.domain.Term> terms = new LinkedList<>();
-		int totalSize = 0, curSize = 0, curIndex = 0;
-		for (org.ansj.domain.Term term : result) {
-			String realName = term.getRealName();
-			curIndex = lang.indexOf(realName, totalSize - curSize - 1);
-			if (curIndex >= totalSize) {
-				curSize = realName.length();
-				totalSize += curSize;
-				terms.add(term);
+		int[] sentArr = new int[lang.length()];
+		keywords.forEach(e -> {
+			int pos = lang.indexOf(e);
+			int len = e.length();
+			for (int i = pos; i < len + pos; i++) {
+				sentArr[i] = 1;
+			}
+		});
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < sentArr.length; i++) {
+			if (1 == sentArr[i]) {
+				builder.append((char) lang.charAt(i));
+			} else {
+				builder.append("|");
 			}
 		}
-		return terms;
+		keywords = new LinkedList<>();
+		int startIndex = 0, endIndex = 0;
+		for (String name : builder.toString().split("\\|")) {
+			if (!"".equals(name)) {
+				keywords.add(name);
+				endIndex = lang.indexOf(name, startIndex);
+				if (endIndex > startIndex) {
+					sentences.add(lang.substring(startIndex, endIndex));
+					System.out.println(startIndex + " ----> " + endIndex);
+				}
+				startIndex = endIndex + name.length();
+			}
+		}
+		endIndex = lang.length();
+		if (startIndex != endIndex) {
+			sentences.add(lang.substring(startIndex, endIndex));
+			startIndex = endIndex;
+		}
+		LOG.info("Keywords: " + keywords + ", Sentences: " + sentences);
 	}
 
 	private void initDslSentence(Collection<String> vars, Collection<String> sentences) {
-		if (Objects.isNull(sentences) || sentences.isEmpty()) {
+		if (sentences == null || sentences.isEmpty()) {
 			return;
 		}
 		try {
