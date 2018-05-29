@@ -3,6 +3,7 @@ package com.ybnf.compiler.lucene;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.ansj.domain.Result;
@@ -31,14 +32,11 @@ public class YydDicNatureRecognition implements Recognition {
 
 	@Override
 	public void recognition(Result result) {
-		for (String varType : varTypes) {
-			Recognition[] recognitions = RECOGNITIONS.get(varType);
-			if (recognitions != null) {
-				for (Recognition recognition : recognitions) {
-					recognition.recognition(result);
-				}
+		varTypes.forEach(varType -> Optional.ofNullable(RECOGNITIONS.get(varType)).ifPresent(recognitions -> {
+			for (Recognition recognition : recognitions) {
+				recognition.recognition(result);
 			}
-		}
+		}));
 		recognition.recognition(result);
 		REC: for (Iterator<Term> it = result.iterator(); it.hasNext();) {
 			Term term = it.next();

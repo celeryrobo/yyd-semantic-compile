@@ -1,6 +1,5 @@
 package com.ybnf.compiler.lucene;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,7 +23,6 @@ import org.nlpcn.commons.lang.util.StringUtil;
 
 import com.ybnf.compiler.beans.LuceneCompileResult;
 import com.ybnf.compiler.beans.YbnfCompileResult;
-import com.ybnf.expr.Expr;
 import com.ybnf.expr.ExprService;
 
 public class SemanticSentence {
@@ -36,7 +34,7 @@ public class SemanticSentence {
 	private Set<String> entTypes;
 	private Set<String> varTypes;
 	private List<String> keywords;
-	private Set<String> sentences;
+	private Map<String, Set<String>> sentences;
 	private ExprService dsl;
 
 	public SemanticSentence(String service, String lang, Set<String> entTypes, Set<String> varTypes) {
@@ -46,7 +44,7 @@ public class SemanticSentence {
 		this.varTypes = varTypes;
 		this.types = new HashSet<>();
 		this.keywords = new LinkedList<>();
-		this.sentences = new HashSet<>();
+		this.sentences = new HashMap<>();
 		this.dsl = new ExprService();
 		Forest[] forests = new Forest[entTypes.size() + 2];
 		forests[0] = DicLibrary.get(); // 默认词库
@@ -56,31 +54,32 @@ public class SemanticSentence {
 			forests[i] = dics[i - 2];
 		}
 		initSentence(lang, forests);
-		initDslSentence(types, sentences);
+		initDslSentence(sentences);
 	}
 
 	private void initSentence(String lang, Forest... forests) {
 		Result result = IndexAnalysis.parse(lang, forests);
 		new YydDicNatureRecognition(varTypes, forests).recognition(result);
 		LOG.info(result.toString());
+		int[] sentArr = new int[lang.length()];
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
-			sentences.add(name);
 			if ("kv".equals(natureStr)) {
-				keywords.add(name);
+				int pos = lang.indexOf(name);
+				int len = name.length();
+				for (int i = pos; i < len + pos; i++) {
+					sentArr[i] = 1;
+				}
 			} else if (natureStr.startsWith("c:")) {
-				types.add(natureStr.substring(2));
+				String type = natureStr.substring(2);
+				types.add(type);
+				if (!sentences.containsKey(type)) {
+					sentences.put(type, new HashSet<>());
+				}
+				sentences.get(type).add(name);
 			}
 		}
-		int[] sentArr = new int[lang.length()];
-		keywords.forEach(e -> {
-			int pos = lang.indexOf(e);
-			int len = e.length();
-			for (int i = pos; i < len + pos; i++) {
-				sentArr[i] = 1;
-			}
-		});
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < sentArr.length; i++) {
 			if (1 == sentArr[i]) {
@@ -89,7 +88,6 @@ public class SemanticSentence {
 				builder.append("|");
 			}
 		}
-		keywords = new LinkedList<>();
 		for (String name : builder.toString().split("\\|")) {
 			if (!"".equals(name)) {
 				keywords.add(name);
@@ -98,14 +96,13 @@ public class SemanticSentence {
 		LOG.info("Keywords: " + keywords + ", Sentences: " + sentences);
 	}
 
-	private void initDslSentence(Collection<String> vars, Collection<String> sentences) {
+	private void initDslSentence(Map<String, Set<String>> sentences) {
 		if (sentences == null || sentences.isEmpty()) {
 			return;
 		}
 		try {
-			Expr parser = ParserUtils.generate(StringUtil.joiner(sentences, "|"), null);
-			for (String type : vars) {
-				dsl.include(type, parser);
+			for (String key : sentences.keySet()) {
+				dsl.include(key, ParserUtils.generate(StringUtil.joiner(sentences.get(key), "|"), null));
 			}
 		} catch (Exception e) {
 		}
