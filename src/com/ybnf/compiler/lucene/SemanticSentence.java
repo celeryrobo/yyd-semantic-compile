@@ -36,7 +36,7 @@ public class SemanticSentence {
 	private Set<String> entTypes;
 	private Set<String> varTypes;
 	private List<String> keywords;
-	private List<String> sentences;
+	private Set<String> sentences;
 	private ExprService dsl;
 
 	public SemanticSentence(String service, String lang, Set<String> entTypes, Set<String> varTypes) {
@@ -46,7 +46,7 @@ public class SemanticSentence {
 		this.varTypes = varTypes;
 		this.types = new HashSet<>();
 		this.keywords = new LinkedList<>();
-		this.sentences = new LinkedList<>();
+		this.sentences = new HashSet<>();
 		this.dsl = new ExprService();
 		Forest[] forests = new Forest[entTypes.size() + 2];
 		forests[0] = DicLibrary.get(); // 默认词库
