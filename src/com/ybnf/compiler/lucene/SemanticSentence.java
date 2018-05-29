@@ -66,6 +66,7 @@ public class SemanticSentence {
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
+			sentences.add(name);
 			if ("kv".equals(natureStr)) {
 				keywords.add(name);
 			} else if (natureStr.startsWith("c:")) {
@@ -89,22 +90,10 @@ public class SemanticSentence {
 			}
 		}
 		keywords = new LinkedList<>();
-		int startIndex = 0, endIndex = 0;
 		for (String name : builder.toString().split("\\|")) {
 			if (!"".equals(name)) {
 				keywords.add(name);
-				endIndex = lang.indexOf(name, startIndex);
-				if (endIndex > startIndex) {
-					sentences.add(lang.substring(startIndex, endIndex));
-					System.out.println(startIndex + " ----> " + endIndex);
-				}
-				startIndex = endIndex + name.length();
 			}
-		}
-		endIndex = lang.length();
-		if (startIndex != endIndex) {
-			sentences.add(lang.substring(startIndex, endIndex));
-			startIndex = endIndex;
 		}
 		LOG.info("Keywords: " + keywords + ", Sentences: " + sentences);
 	}
