@@ -12,7 +12,7 @@ public abstract class LuceneService implements AutoCloseable {
 		try {
 			String platform = System.getProperty("os.name", "linux");
 			String path = "/tmp/lucene-indexes";
-			if(platform.toLowerCase().startsWith("win")) {
+			if (platform.toLowerCase().startsWith("win")) {
 				path = "E:" + path;
 			}
 			directory = FSDirectory.open(Paths.get(path));

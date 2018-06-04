@@ -53,7 +53,7 @@ public class Main {
 		Map<String, String> o = service.compile("$number", "十二点五六");
 		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);
-		
+
 		float f = ParserUtils.distanceScore("我想知道黄鹤楼是不是在安徽", "黄鹤楼是不是在安徽");
 		System.out.println(f);
 	}
