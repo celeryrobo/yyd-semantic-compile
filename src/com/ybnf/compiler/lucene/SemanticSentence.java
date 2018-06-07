@@ -95,13 +95,14 @@ public class SemanticSentence {
 			if (1 == sentArr[i]) {
 				builder.append(lang.charAt(i));
 			} else {
-				builder.append("|");
+				if (builder.length() != 0) {
+					keywords.add(builder.toString());
+					builder = new StringBuilder();
+				}
 			}
 		}
-		for (String name : builder.toString().split("\\|")) {
-			if (!"".equals(name)) {
-				keywords.add(name);
-			}
+		if (builder.length() != 0) {
+			keywords.add(builder.toString());
 		}
 		LOG.info("Keywords: " + keywords + ", Sentences: " + sentences);
 	}
