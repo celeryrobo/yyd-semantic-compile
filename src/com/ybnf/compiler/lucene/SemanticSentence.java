@@ -61,16 +61,14 @@ public class SemanticSentence {
 		Result result = IndexAnalysis.parse(lang, forests);
 		new YydDicNatureRecognition(varTypes, forests).recognition(result);
 		LOG.info(result.toString());
-		int[] sentArr = new int[lang.length()];
 		int wordIndex = 0;
 		for (org.ansj.domain.Term term : result) {
-			System.out.println(term.getOffe() + ":" + term.getName());
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
 			int pos = term.getOffe();
 			int len = name.length();
 			if (pos < wordIndex) {
-				if ((pos + len) < wordIndex) {
+				if ((pos + len) <= wordIndex) {
 					continue;
 				} else {
 					len = len + pos - wordIndex;
@@ -79,8 +77,8 @@ public class SemanticSentence {
 			}
 			wordIndex = pos + len;
 			if ("kv".equals(natureStr)) {
-				for (int i = pos; i < len + pos; i++) {
-					sentArr[i] = 1;
+				if (!"".equals(name)) {
+					keywords.add(name);
 				}
 			} else if (natureStr.startsWith("c:")) {
 				String type = natureStr.substring(2);
@@ -89,19 +87,6 @@ public class SemanticSentence {
 					sentences.put(type, new HashSet<>());
 				}
 				sentences.get(type).add(name);
-			}
-		}
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < sentArr.length; i++) {
-			if (1 == sentArr[i]) {
-				builder.append(lang.charAt(i));
-			} else {
-				builder.append("|");
-			}
-		}
-		for (String name : builder.toString().split("\\|")) {
-			if (!"".equals(name)) {
-				keywords.add(name);
 			}
 		}
 		LOG.info("Keywords: " + keywords + ", Sentences: " + sentences);
