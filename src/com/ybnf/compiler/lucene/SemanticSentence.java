@@ -62,12 +62,23 @@ public class SemanticSentence {
 		new YydDicNatureRecognition(varTypes, forests).recognition(result);
 		LOG.info(result.toString());
 		int[] sentArr = new int[lang.length()];
+		int wordIndex = 0;
 		for (org.ansj.domain.Term term : result) {
+			System.out.println(term.getOffe() + ":" + term.getName());
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
+			int pos = term.getOffe();
+			int len = name.length();
+			if (pos < wordIndex) {
+				if ((pos + len) < wordIndex) {
+					continue;
+				} else {
+					len = len + pos - wordIndex;
+					pos = wordIndex;
+				}
+			}
+			wordIndex = pos + len;
 			if ("kv".equals(natureStr)) {
-				int pos = lang.indexOf(name);
-				int len = name.length();
 				for (int i = pos; i < len + pos; i++) {
 					sentArr[i] = 1;
 				}
@@ -83,7 +94,7 @@ public class SemanticSentence {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < sentArr.length; i++) {
 			if (1 == sentArr[i]) {
-				builder.append((char) lang.charAt(i));
+				builder.append(lang.charAt(i));
 			} else {
 				builder.append("|");
 			}
