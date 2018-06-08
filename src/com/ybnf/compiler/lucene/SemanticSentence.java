@@ -94,11 +94,9 @@ public class SemanticSentence {
 		for (int i = 0; i < sentArr.length; i++) {
 			if (1 == sentArr[i]) {
 				builder.append(lang.charAt(i));
-			} else {
-				if (builder.length() != 0) {
-					keywords.add(builder.toString());
-					builder = new StringBuilder();
-				}
+			} else if (builder.length() != 0) {
+				keywords.add(builder.toString());
+				builder = new StringBuilder();
 			}
 		}
 		if (builder.length() != 0) {
