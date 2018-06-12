@@ -23,8 +23,8 @@ public class ExprService {
 	static {
 		// 数字
 		Expr number = new Or(new Word("零"), new Word("一"), new Word("二"), new Word("两"), new Word("三"), new Word("四"),
-				new Word("五"), new Word("六"), new Word("七"), new Word("八"), new Word("九"), new Word("九"), new Word("十"),
-				new Word("百"), new Word("千"), new Word("万"), new Word("亿"), new Regex("\\d"));
+				new Word("五"), new Word("六"), new Word("七"), new Word("八"), new Word("九"), new Word("十"), new Word("百"),
+				new Word("千"), new Word("万"), new Word("亿"), new Regex("\\d"));
 		number = new OneOrMany(number);
 		number = new Group(number,
 				new Selectable(new Group(new Group(new Or(new Word("点"), new Word("\\."))), number)));
