@@ -130,10 +130,11 @@ public class SemanticSentence {
 		for (String keyword : keywords) {
 			booleanBuilder.add(new TermQuery(new Term("template", keyword)), Occur.MUST);
 		}
+		int power = varTypes.size() + 1;
 		for (String type : varTypes) {
 			Query query = new TermQuery(new Term("template", type.toLowerCase()));
 			if (types.contains(type)) {
-				booleanBuilder.add(new BoostQuery(query, 4.0F), Occur.SHOULD);
+				booleanBuilder.add(new BoostQuery(query, power--), Occur.SHOULD);
 			} else {
 				booleanBuilder.add(query, Occur.SHOULD);
 			}
