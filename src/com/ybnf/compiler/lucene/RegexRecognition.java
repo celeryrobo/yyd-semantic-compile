@@ -27,7 +27,8 @@ public class RegexRecognition implements Recognition {
 		List<Term> terms = result.getTerms();
 		for (Term term : terms) {
 			// 分词后为关键词词性则不再进行分词
-			if ("kv".equals(term.getNatureStr())) {
+			String natureStr = term.getNatureStr();
+			if ("kv".equals(natureStr) || natureStr.startsWith("c:")) {
 				regexTerms.add(term);
 				continue;
 			}
