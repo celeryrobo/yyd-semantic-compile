@@ -75,7 +75,7 @@ public class ExprService {
 					break;
 				}
 			} else if (!lang.contains(token)) {
-				throw new Exception("Semantic Match Failture !");
+				throw new Exception("Semantic Match Failture, Keyword is not exsit!");
 			}
 		}
 		Expr expr = ParserUtils.generate(template, includes);
