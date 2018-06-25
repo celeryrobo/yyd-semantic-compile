@@ -77,12 +77,7 @@ public class SemanticSentence {
 			int pos = term.getOffe();
 			int len = name.length();
 			if (pos < wordIndex) {
-				if ((pos + len) < wordIndex) {
-					continue;
-				} else {
-					len = pos + len - wordIndex;
-					pos = wordIndex;
-				}
+				continue;
 			}
 			wordIndex = pos + len;
 			if (isKeyword) {
