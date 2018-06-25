@@ -74,6 +74,8 @@ public class ExprService {
 					varNames.add(varName);
 					break;
 				}
+			} else if (!lang.contains(token)) {
+				throw new Exception("Semantic Match Failture !");
 			}
 		}
 		Expr expr = ParserUtils.generate(template, includes);
