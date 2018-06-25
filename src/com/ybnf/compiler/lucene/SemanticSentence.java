@@ -63,8 +63,16 @@ public class SemanticSentence {
 		LOG.info(result.toString());
 		int[] sentArr = new int[lang.length()];
 		int wordIndex = 0;
+		boolean isKeyword = false;
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
+			if ("kv".equals(natureStr)) {
+				isKeyword = true;
+			} else if (natureStr.startsWith("c:")) {
+				isKeyword = false;
+			} else {
+				continue;
+			}
 			String name = term.getName();
 			int pos = term.getOffe();
 			int len = name.length();
@@ -77,11 +85,11 @@ public class SemanticSentence {
 				}
 			}
 			wordIndex = pos + len;
-			if ("kv".equals(natureStr)) {
+			if (isKeyword) {
 				for (int i = pos; i < len + pos; i++) {
 					sentArr[i] = 1;
 				}
-			} else if (natureStr.startsWith("c:")) {
+			} else {
 				String type = natureStr.substring(2);
 				types.add(type);
 				if (!sentences.containsKey(type)) {
