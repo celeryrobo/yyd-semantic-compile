@@ -126,21 +126,17 @@ public class SemanticSentence {
 	}
 
 	public Query buildQuery(Integer companyId) {
-		if (keywords.isEmpty() && varTypes.isEmpty()) {
+		if (keywords.isEmpty() && types.isEmpty()) {
 			return null;
 		}
 		BooleanQuery.Builder booleanBuilder = new BooleanQuery.Builder();
 		for (String keyword : keywords) {
 			booleanBuilder.add(new TermQuery(new Term("template", keyword)), Occur.MUST);
 		}
-		int power = varTypes.size() + 1;
-		for (String type : varTypes) {
+		int power = types.size();
+		for (String type : types) {
 			Query query = new TermQuery(new Term("template", type.toLowerCase()));
-			if (types.contains(type)) {
-				booleanBuilder.add(new BoostQuery(query, power--), Occur.SHOULD);
-			} else {
-				booleanBuilder.add(query, Occur.SHOULD);
-			}
+			booleanBuilder.add(new BoostQuery(query, power--), Occur.SHOULD);
 		}
 		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
 		if ("QA".equals(service)) {
