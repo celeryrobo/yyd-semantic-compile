@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.apache.lucene.search.Query;
@@ -25,7 +26,8 @@ public class LuceneCompiler implements ICompiler {
 	private static final ThreadLocal<Integer> COMPANY_ID = new ThreadLocal<>();
 	private SemanticService semanticService = null;
 
-	public static void init(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
+	public static void init(Map<String, Map<String, List<String>>> sceneIntentTemplates,
+			Map<String, List<String>> entitiesPriorities) throws Exception {
 		if (sceneIntentTemplates == null) {
 			return;
 		}
@@ -34,11 +36,13 @@ public class LuceneCompiler implements ICompiler {
 		for (String service : sceneIntentTemplates.keySet()) {
 			dics.add("SRV" + service);
 		}
+		Optional<Map<String, List<String>>> entitiesPrioritiesOptional = Optional.ofNullable(entitiesPriorities);
 		try (IndexWriterService writerService = new IndexWriterService(dics)) {
 			writerService.deleteAll();
 			for (Entry<String, Map<String, List<String>>> sceneIntentTemplate : sceneIntentTemplates.entrySet()) {
 				String sceneName = sceneIntentTemplate.getKey();
-				SemanticService service = new SemanticService(sceneName);
+				SemanticService service = new SemanticService(sceneName,
+						entitiesPrioritiesOptional.map(ep -> ep.get(sceneName)).orElse(null));
 				for (Entry<String, List<String>> intentTemplate : sceneIntentTemplate.getValue().entrySet()) {
 					String intentName = intentTemplate.getKey();
 					SemanticIntent intent = service.buildIntent(intentName);
@@ -67,7 +71,7 @@ public class LuceneCompiler implements ICompiler {
 	public YbnfCompileResult compile(String text) throws Exception {
 		SemanticSentence sentence = semanticService.buildSentence(text);
 		Query query = sentence.buildQuery(COMPANY_ID.get());
-		LOG.info(query.toString());
+		LOG.info(Optional.ofNullable(query).map(q -> q.toString()).orElse("no query"));
 		List<TemplateEntity> entities = null;
 		try (IndexReaderService readerService = new IndexReaderService()) {
 			entities = readerService.search(query);

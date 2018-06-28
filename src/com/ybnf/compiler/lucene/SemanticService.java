@@ -1,17 +1,23 @@
 package com.ybnf.compiler.lucene;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SemanticService {
 	private String name;
 	private Map<String, SemanticIntent> intents;
+	private List<String> entitiesPrioritiy;
 
-	public SemanticService(String name) {
+	public SemanticService(String name, List<String> entitiesPrioritiy) {
 		this.name = name;
 		this.intents = new HashMap<>();
+		this.entitiesPrioritiy = entitiesPrioritiy;
 	}
 
 	public String getName() {
@@ -38,7 +44,14 @@ public class SemanticService {
 			types.addAll(intent.getEntTypes());
 			varTypes.addAll(intent.getVarTypes());
 		}
-		return new SemanticSentence(name, lang, types, varTypes);
+		List<String> entTypes = new ArrayList<>();
+		Optional<List<String>> entitiesPrioritiyOptional = Optional.ofNullable(entitiesPrioritiy);
+		entTypes.addAll(entitiesPrioritiyOptional
+				.map(ep -> types.stream().filter(e -> !ep.contains(e)).collect(Collectors.toList()))
+				.orElseGet(() -> types.stream().collect(Collectors.toList())));
+		entitiesPrioritiyOptional.ifPresent(
+				ep -> entTypes.addAll(ep.stream().filter(e -> types.contains(e)).collect(Collectors.toList())));
+		return new SemanticSentence(name, lang, entTypes, varTypes);
 	}
 
 	@Override

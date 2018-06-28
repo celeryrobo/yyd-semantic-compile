@@ -31,13 +31,13 @@ public class SemanticSentence {
 	private String lang;
 	private String service;
 	private Set<String> types;
-	private Set<String> entTypes;
+	private List<String> entTypes;
 	private Set<String> varTypes;
 	private List<String> keywords;
 	private Map<String, Set<String>> sentences;
 	private ExprService dsl;
 
-	public SemanticSentence(String service, String lang, Set<String> entTypes, Set<String> varTypes) {
+	public SemanticSentence(String service, String lang, List<String> entTypes, Set<String> varTypes) {
 		this.lang = lang;
 		this.service = service;
 		this.entTypes = entTypes;
@@ -46,13 +46,15 @@ public class SemanticSentence {
 		this.keywords = new LinkedList<>();
 		this.sentences = new HashMap<>();
 		this.dsl = new ExprService();
-		Forest[] forests = new Forest[entTypes.size() + 2];
-		forests[0] = DicLibrary.get(); // 默认词库
-		forests[1] = DicLibrary.get("SRV" + service); // 当前场景内的关键词词库
+		int entTypeSize = entTypes.size();
+		Forest[] forests = new Forest[entTypeSize + 2];
 		Forest[] dics = DicLibrary.gets(this.entTypes);
-		for (int i = 2; i < forests.length; i++) {
-			forests[i] = dics[i - 2];
+		int index = 0;
+		for (; index < entTypeSize; index++) {
+			forests[index] = dics[index];
 		}
+		forests[index] = DicLibrary.get(); // 默认词库
+		forests[index + 1] = DicLibrary.get("SRV" + service); // 当前场景内的关键词词库
 		initSentence(lang, forests);
 		initDslSentence(sentences);
 	}
@@ -162,11 +164,15 @@ public class SemanticSentence {
 
 	public YbnfCompileResult compile(List<TemplateEntity> templateEntities) throws Exception {
 		StringBuilder sb = new StringBuilder("\n");
-		for (TemplateEntity templateEntity : templateEntities) {
-			try {
-				return compile(templateEntity);
-			} catch (Exception e) {
-				sb.append(templateEntity).append(" : ").append(e).append("\n");
+		if (templateEntities.isEmpty()) {
+			sb.append("Template Empty!!!");
+		} else {
+			for (TemplateEntity templateEntity : templateEntities) {
+				try {
+					return compile(templateEntity);
+				} catch (Exception e) {
+					sb.append(templateEntity).append(" : ").append(e).append("\n");
+				}
 			}
 		}
 		throw new Exception(sb.toString());
