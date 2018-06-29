@@ -15,7 +15,6 @@ import org.ansj.splitWord.analysis.IndexAnalysis;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.nlpcn.commons.lang.tire.domain.Forest;
@@ -134,10 +133,9 @@ public class SemanticSentence {
 		for (String keyword : keywords) {
 			booleanBuilder.add(new TermQuery(new Term("template", keyword)), Occur.MUST);
 		}
-		int power = types.size();
 		for (String type : types) {
 			Query query = new TermQuery(new Term("template", type.toLowerCase()));
-			booleanBuilder.add(new BoostQuery(query, power--), Occur.SHOULD);
+			booleanBuilder.add(query, Occur.SHOULD);
 		}
 		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
 		if ("QA".equals(service)) {
