@@ -68,14 +68,20 @@ public class SemanticSentence {
 		boolean isKeyword = false;
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
+			String name = term.getName();
 			if ("kv".equals(natureStr)) {
 				isKeyword = true;
 			} else if (natureStr.startsWith("c:")) {
 				isKeyword = false;
+				String type = natureStr.substring(2);
+				types.add(type);
+				if (!sentences.containsKey(type)) {
+					sentences.put(type, new HashSet<>());
+				}
+				sentences.get(type).add(name);
 			} else {
 				continue;
 			}
-			String name = term.getName();
 			int pos = term.getOffe();
 			int len = name.length();
 			if (pos < wordIndex) {
@@ -86,13 +92,6 @@ public class SemanticSentence {
 				for (int i = pos; i < len + pos; i++) {
 					sentArr[i] = 1;
 				}
-			} else {
-				String type = natureStr.substring(2);
-				types.add(type);
-				if (!sentences.containsKey(type)) {
-					sentences.put(type, new HashSet<>());
-				}
-				sentences.get(type).add(name);
 			}
 		}
 		StringBuilder builder = new StringBuilder();
