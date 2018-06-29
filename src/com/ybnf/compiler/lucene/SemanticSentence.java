@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 import org.ansj.domain.Result;
 import org.ansj.library.DicLibrary;
-import org.ansj.splitWord.analysis.IndexAnalysis;
+import org.ansj.splitWord.analysis.DicAnalysis;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
@@ -59,51 +59,22 @@ public class SemanticSentence {
 	}
 
 	private void initSentence(String lang, Forest... forests) {
-		Result result = IndexAnalysis.parse(lang, forests);
+		Result result = DicAnalysis.parse(lang, forests);
 		new YydDicNatureRecognition(varTypes, forests).recognition(result);
 		LOG.info(result.toString());
-		int[] sentArr = new int[lang.length()];
-		int wordIndex = 0;
-		boolean isKeyword = false;
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
 			if ("kv".equals(natureStr)) {
-				isKeyword = true;
+				keywords.add(name);
 			} else if (natureStr.startsWith("c:")) {
-				isKeyword = false;
 				String type = natureStr.substring(2);
 				types.add(type);
 				if (!sentences.containsKey(type)) {
 					sentences.put(type, new HashSet<>());
 				}
 				sentences.get(type).add(name);
-			} else {
-				continue;
 			}
-			int pos = term.getOffe();
-			int len = name.length();
-			if (pos < wordIndex) {
-				continue;
-			}
-			wordIndex = pos + len;
-			if (isKeyword) {
-				for (int i = pos; i < len + pos; i++) {
-					sentArr[i] = 1;
-				}
-			}
-		}
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < sentArr.length; i++) {
-			if (1 == sentArr[i]) {
-				builder.append(lang.charAt(i));
-			} else if (builder.length() != 0) {
-				keywords.add(builder.toString());
-				builder = new StringBuilder();
-			}
-		}
-		if (builder.length() != 0) {
-			keywords.add(builder.toString());
 		}
 		LOG.info("Keywords: " + keywords + ", Sentences: " + sentences);
 	}

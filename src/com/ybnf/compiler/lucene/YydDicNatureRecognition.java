@@ -53,14 +53,14 @@ public class YydDicNatureRecognition implements Recognition {
 			}
 			int size = terms.size();
 			if (termSize == size) {
+				Optional.of(term).filter(e -> "kv".equals(e.getNatureStr()) || e.getNatureStr().startsWith("c:"))
+						.ifPresent(e -> e.setNature(RegexRecognition.TMP_NATURE));
 				terms.add(term);
 				termSize += 1;
 			} else {
 				termSize = size;
 			}
 		}
-		if (!terms.isEmpty()) {
-			result.setTerms(terms);
-		}
+		result.setTerms(terms);
 	}
 }

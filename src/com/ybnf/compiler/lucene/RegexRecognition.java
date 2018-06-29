@@ -12,7 +12,7 @@ import org.ansj.recognition.Recognition;
 
 public class RegexRecognition implements Recognition {
 	private static final long serialVersionUID = 1L;
-	private static final Nature TMP_NATURE = new Nature("tmp");
+	public static final Nature TMP_NATURE = new Nature("tmp");
 	private Pattern pattern;
 	private Nature nature;
 
