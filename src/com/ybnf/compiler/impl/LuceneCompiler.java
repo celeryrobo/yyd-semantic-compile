@@ -26,8 +26,7 @@ public class LuceneCompiler implements ICompiler {
 	private static final ThreadLocal<Integer> COMPANY_ID = new ThreadLocal<>();
 	private SemanticService semanticService = null;
 
-	public static void init(Map<String, Map<String, List<String>>> sceneIntentTemplates,
-			Map<String, List<String>> entitiesPriorities) throws Exception {
+	public static void init(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
 		if (sceneIntentTemplates == null) {
 			return;
 		}
@@ -36,13 +35,11 @@ public class LuceneCompiler implements ICompiler {
 		for (String service : sceneIntentTemplates.keySet()) {
 			dics.add("SRV" + service);
 		}
-		Optional<Map<String, List<String>>> entitiesPrioritiesOptional = Optional.ofNullable(entitiesPriorities);
 		try (IndexWriterService writerService = new IndexWriterService(dics)) {
 			writerService.deleteAll();
 			for (Entry<String, Map<String, List<String>>> sceneIntentTemplate : sceneIntentTemplates.entrySet()) {
 				String sceneName = sceneIntentTemplate.getKey();
-				SemanticService service = new SemanticService(sceneName,
-						entitiesPrioritiesOptional.map(ep -> ep.get(sceneName)).orElse(null));
+				SemanticService service = new SemanticService(sceneName);
 				for (Entry<String, List<String>> intentTemplate : sceneIntentTemplate.getValue().entrySet()) {
 					String intentName = intentTemplate.getKey();
 					SemanticIntent intent = service.buildIntent(intentName);
@@ -77,9 +74,6 @@ public class LuceneCompiler implements ICompiler {
 			entities = readerService.search(query);
 		}
 		LOG.info("TemplateEntity : ");
-		if (entities == null) {
-			return null;
-		}
 		entities.forEach(entity -> LOG.info(entity.toString()));
 		return sentence.compile(entities);
 	}

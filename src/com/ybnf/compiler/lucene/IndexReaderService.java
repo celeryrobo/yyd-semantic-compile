@@ -29,9 +29,6 @@ public class IndexReaderService extends LuceneService {
 		}
 		TopDocs docs = searcher.search(query, 10);
 		LOG.info("total hits : " + docs.totalHits);
-		if (docs.totalHits == 0) {
-			return null;
-		}
 		for (ScoreDoc scoreDoc : docs.scoreDocs) {
 			entities.add(buildTemplateEntity(scoreDoc));
 		}

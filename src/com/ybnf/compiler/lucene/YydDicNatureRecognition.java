@@ -1,11 +1,13 @@
 package com.ybnf.compiler.lucene;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.ansj.domain.Nature;
 import org.ansj.domain.Result;
 import org.ansj.domain.Term;
 import org.ansj.recognition.Recognition;
@@ -20,12 +22,10 @@ public class YydDicNatureRecognition implements Recognition {
 		RECOGNITIONS.put("number", new Recognition[] { new RegexRecognition("\\d+(\\.\\d+)?", "number"),
 				new RegexRecognition("((零|一|二|三|四|五|六|七|八|九|十)(十|百|千|万|亿|兆)*)+", "number") });
 	}
-	private UserDicNatureRecognition recognition;
 	private Forest[] forests;
 	private Set<String> varTypes;
 
 	public YydDicNatureRecognition(Set<String> varTypes, Forest... forests) {
-		recognition = new UserDicNatureRecognition(forests);
 		this.forests = forests;
 		this.varTypes = varTypes;
 	}
@@ -37,19 +37,30 @@ public class YydDicNatureRecognition implements Recognition {
 				recognition.recognition(result);
 			}
 		}));
-		recognition.recognition(result);
-		REC: for (Iterator<Term> it = result.iterator(); it.hasNext();) {
-			Term term = it.next();
-			if (!"kv".equals(term.getNatureStr())) {
-				continue REC;
+		List<Term> terms = new ArrayList<>();
+		int termSize = 0;
+		for (Term term : result) {
+			for (Forest forest : forests) {
+				String[] params = UserDicNatureRecognition.getParams(forest, term.getName());
+				Optional.ofNullable(params).map(param -> param[0]).map(natureName -> {
+					if ("kv".equals(natureName) || natureName.startsWith("c:")) {
+						Term tm = new Term(term.getName(), term.getOffe(), term.item());
+						tm.setNature(new Nature(natureName));
+						return tm;
+					}
+					return null;
+				}).ifPresent(tm -> terms.add(tm));
 			}
-			for (int i = forests.length - 1; i > -1; i--) {
-				String[] params = UserDicNatureRecognition.getParams(forests[i], term.getName());
-				if (params != null) {
-					continue REC;
-				}
+			int size = terms.size();
+			if (termSize == size) {
+				terms.add(term);
+				termSize += 1;
+			} else {
+				termSize = size;
 			}
-			it.remove();
+		}
+		if (!terms.isEmpty()) {
+			result.setTerms(terms);
 		}
 	}
 }

@@ -31,13 +31,13 @@ public class SemanticSentence {
 	private String lang;
 	private String service;
 	private Set<String> types;
-	private List<String> entTypes;
+	private Set<String> entTypes;
 	private Set<String> varTypes;
 	private List<String> keywords;
 	private Map<String, Set<String>> sentences;
 	private ExprService dsl;
 
-	public SemanticSentence(String service, String lang, List<String> entTypes, Set<String> varTypes) {
+	public SemanticSentence(String service, String lang, Set<String> entTypes, Set<String> varTypes) {
 		this.lang = lang;
 		this.service = service;
 		this.entTypes = entTypes;
