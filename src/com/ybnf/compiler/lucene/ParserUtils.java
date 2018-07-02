@@ -239,28 +239,46 @@ public class ParserUtils {
 	public static void recognition(String lang, Result result) {
 		Iterator<Term> terms = result.iterator();
 		int[] arr = new int[lang.length()];
+		int pos = 0, len = 0;
 		while (terms.hasNext()) {
 			Term term = terms.next();
 			String natureStr = term.getNatureStr();
 			int length = term.getName().length();
 			int position = term.getOffe();
-			int power = 0;
+			boolean isRemoved = false;
 			if ("kv".equals(natureStr)) {
-				power = 1;
+				for (int i = position; i < position + length; i++) {
+					if (0 == arr[i]) {
+						arr[i] = 1;
+					} else {
+						isRemoved = true;
+						break;
+					}
+				}
 			} else if (natureStr.startsWith("c:")) {
-				power = 2;
-			}
-			boolean isRemove = false;
-			for (int i = position; i < position + length; i++) {
-				if (0 == arr[i]) {
-					arr[i] = power;
+				if (position < pos + len) {
+					if (position == pos && length == len) {
+						isRemoved = false;
+					} else {
+						isRemoved = true;
+					}
 				} else {
-					isRemove = true;
-					break;
+					for (int i = position; i < position + length; i++) {
+						if (0 == arr[i] || 2 == arr[i]) {
+							arr[i] = 2;
+						} else {
+							isRemoved = true;
+							break;
+						}
+					}
 				}
 			}
-			if (isRemove) {
+			if (isRemoved) {
 				terms.remove();
+			}
+			if (position > pos) {
+				pos = position;
+				len = length;
 			}
 		}
 	}
