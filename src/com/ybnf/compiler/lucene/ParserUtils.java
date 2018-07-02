@@ -1,9 +1,13 @@
 package com.ybnf.compiler.lucene;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
+
+import org.ansj.domain.Result;
+import org.ansj.domain.Term;
 
 import com.ybnf.compiler.lucene.parsers.Choices;
 import com.ybnf.compiler.lucene.parsers.Group;
@@ -230,5 +234,26 @@ public class ParserUtils {
 		}
 		int distance = vecs[sourceLen][targetLen];
 		return 1 - (float) distance / Math.max(sourceLen, targetLen);
+	}
+
+	public static void recognition(String lang, Result result) {
+		Iterator<Term> terms = result.iterator();
+		int pos = 0;
+		while (terms.hasNext()) {
+			Term term = terms.next();
+			String natureStr = term.getNatureStr();
+			if (!"kv".equals(natureStr) && !natureStr.startsWith("c:")) {
+				terms.remove();
+				continue;
+			}
+			int length = term.getName().length();
+			int position = term.getOffe();
+			if (pos <= position) {
+				pos = position + length;
+			} else {
+				terms.remove();
+				continue;
+			}
+		}
 	}
 }
