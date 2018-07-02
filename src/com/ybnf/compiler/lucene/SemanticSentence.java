@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.ansj.domain.Result;
 import org.ansj.library.DicLibrary;
@@ -61,7 +63,7 @@ public class SemanticSentence {
 		Result result = IndexAnalysis.parse(lang, forests);
 		new YydDicNatureRecognition(varTypes, forests).recognition(result);
 		LOG.info(result.toString());
-		ParserUtils.recognition(result);
+		ParserUtils.recognition(lang, result);
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
@@ -84,8 +86,10 @@ public class SemanticSentence {
 			return;
 		}
 		try {
-			for (String key : sentences.keySet()) {
-				dsl.include(key, ParserUtils.generate(StringUtil.joiner(sentences.get(key), "|"), null));
+			for (Entry<String, Set<String>> entry : sentences.entrySet()) {
+				List<String> value = entry.getValue().stream().sorted((e0, e1) -> e1.length() - e0.length())
+						.collect(Collectors.toList());
+				dsl.include(entry.getKey(), ParserUtils.generate(StringUtil.joiner(value, "|"), null));
 			}
 		} catch (Exception e) {
 		}

@@ -145,7 +145,7 @@ public class ParserUtils {
 				tplParse(stacks, tokenizer, includes);
 				Expr second = stacks.pop();
 				Expr first = stacks.pop();
-				stacks.push(new com.ybnf.expr.impl.Group(new com.ybnf.expr.impl.Or(first, second)));
+				stacks.push(new com.ybnf.expr.impl.Or(first, second));
 				break;
 			}
 			throw new Exception("or parser error");
@@ -236,27 +236,32 @@ public class ParserUtils {
 		return 1 - (float) distance / Math.max(sourceLen, targetLen);
 	}
 
-	public static void recognition(Result result) {
+	public static void recognition(String lang, Result result) {
 		Iterator<Term> terms = result.iterator();
-		int pos = 0;
+		int[] arr = new int[lang.length()];
 		while (terms.hasNext()) {
 			Term term = terms.next();
 			String natureStr = term.getNatureStr();
-			String name = term.getName();
-			int length = name.length();
+			int length = term.getName().length();
 			int position = term.getOffe();
+			int power = 0;
 			if ("kv".equals(natureStr)) {
-				if (pos <= position) {
-					pos = position + length;
-					continue;
-				}
+				power = 1;
 			} else if (natureStr.startsWith("c:")) {
-				if (pos < position) {
-					pos = position + length;
-				}
-				continue;
+				power = 2;
 			}
-			terms.remove();
+			boolean isRemove = false;
+			for (int i = position; i < position + length; i++) {
+				if (0 == arr[i]) {
+					arr[i] = power;
+				} else {
+					isRemove = true;
+					break;
+				}
+			}
+			if (isRemove) {
+				terms.remove();
+			}
 		}
 	}
 }
