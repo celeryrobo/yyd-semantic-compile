@@ -236,7 +236,7 @@ public class ParserUtils {
 		return 1 - (float) distance / Math.max(sourceLen, targetLen);
 	}
 
-	public static void recognition(String lang, Result result) {
+	public static void recognition(Result result) {
 		Iterator<Term> terms = result.iterator();
 		int pos = 0;
 		while (terms.hasNext()) {

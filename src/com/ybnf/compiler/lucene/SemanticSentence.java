@@ -63,7 +63,7 @@ public class SemanticSentence {
 		Result result = IndexAnalysis.parse(lang, forests);
 		new YydDicNatureRecognition(varTypes, forests).recognition(result);
 		LOG.info(result.toString());
-		ParserUtils.recognition(lang, result);
+		ParserUtils.recognition(result);
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
