@@ -48,7 +48,6 @@ public class SemanticSentence {
 		int entTypeSize = entTypes.size();
 		Forest[] forests = new Forest[entTypeSize + 2];
 		Forest[] dics = DicLibrary.gets(this.entTypes);
-		System.out.println(entTypes);
 		int index = 0;
 		for (; index < entTypeSize; index++) {
 			forests[index] = dics[index];
