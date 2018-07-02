@@ -272,11 +272,12 @@ public class ParserUtils {
 						}
 					}
 				}
+			} else {
+				isRemoved = true;
 			}
 			if (isRemoved) {
 				terms.remove();
-			}
-			if (position > pos) {
+			} else if (position > pos) {
 				pos = position;
 				len = length;
 			}
