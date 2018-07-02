@@ -242,13 +242,19 @@ public class ParserUtils {
 		while (terms.hasNext()) {
 			Term term = terms.next();
 			String natureStr = term.getNatureStr();
-			if ("kv".equals(natureStr) || natureStr.startsWith("c:")) {
-				int length = term.getName().length();
-				int position = term.getOffe();
+			String name = term.getName();
+			int length = name.length();
+			int position = term.getOffe();
+			if ("kv".equals(natureStr)) {
 				if (pos <= position) {
 					pos = position + length;
 					continue;
 				}
+			} else if (natureStr.startsWith("c:")) {
+				if (pos < position) {
+					pos = position + length;
+				}
+				continue;
 			}
 			terms.remove();
 		}

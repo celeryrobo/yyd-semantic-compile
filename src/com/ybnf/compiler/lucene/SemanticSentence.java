@@ -2,7 +2,6 @@ package com.ybnf.compiler.lucene;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +31,7 @@ public class SemanticSentence {
 	private Set<String> types;
 	private Set<String> entTypes;
 	private Set<String> varTypes;
-	private List<String> keywords;
+	private Set<String> keywords;
 	private Map<String, Set<String>> sentences;
 	private ExprService dsl;
 
@@ -42,7 +41,7 @@ public class SemanticSentence {
 		this.entTypes = entTypes;
 		this.varTypes = varTypes;
 		this.types = new HashSet<>();
-		this.keywords = new LinkedList<>();
+		this.keywords = new HashSet<>();
 		this.sentences = new HashMap<>();
 		this.dsl = new ExprService();
 		int entTypeSize = entTypes.size();
