@@ -3,6 +3,7 @@ package com.ybnf.compiler.lucene;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
@@ -236,6 +237,17 @@ public class ParserUtils {
 		return 1 - (float) distance / Math.max(sourceLen, targetLen);
 	}
 
+	public static boolean isKeyword(String keyword) {
+		return "kv".equals(keyword);
+	}
+
+	public static boolean isCategory(String category) {
+		if (Objects.equals(category, "")) {
+			return false;
+		}
+		return category.startsWith("c:");
+	}
+
 	public static void recognition(String lang, Result result) {
 		Iterator<Term> terms = result.iterator();
 		int[] arr = new int[lang.length()];
@@ -246,7 +258,7 @@ public class ParserUtils {
 			int length = term.getName().length();
 			int position = term.getOffe();
 			boolean isRemoved = false;
-			if ("kv".equals(natureStr)) {
+			if (isKeyword(natureStr)) {
 				for (int i = position; i < position + length; i++) {
 					if (0 == arr[i]) {
 						arr[i] = 1;
@@ -255,7 +267,7 @@ public class ParserUtils {
 						break;
 					}
 				}
-			} else if (natureStr.startsWith("c:")) {
+			} else if (isCategory(natureStr)) {
 				if (position < pos + len) {
 					if (position == pos && length == len) {
 						isRemoved = false;

@@ -67,9 +67,9 @@ public class SemanticSentence {
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
-			if ("kv".equals(natureStr)) {
+			if (ParserUtils.isKeyword(natureStr)) {
 				keywords.add(name);
-			} else if (natureStr.startsWith("c:")) {
+			} else if (ParserUtils.isCategory(natureStr)) {
 				String type = natureStr.substring(2);
 				types.add(type);
 				if (!sentences.containsKey(type)) {

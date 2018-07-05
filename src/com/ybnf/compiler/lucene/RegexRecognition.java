@@ -12,7 +12,7 @@ import org.ansj.recognition.Recognition;
 
 public class RegexRecognition implements Recognition {
 	private static final long serialVersionUID = 1L;
-	public static final Nature TMP_NATURE = new Nature("tmp");
+	public static final Nature IGNORE_NATURE = new Nature("ignore");
 	private Pattern pattern;
 	private Nature nature;
 
@@ -28,7 +28,7 @@ public class RegexRecognition implements Recognition {
 		for (Term term : terms) {
 			// 分词后为关键词词性则不再进行分词
 			String natureStr = term.getNatureStr();
-			if ("kv".equals(natureStr) || natureStr.startsWith("c:")) {
+			if (ParserUtils.isKeyword(natureStr) || ParserUtils.isCategory(natureStr)) {
 				regexTerms.add(term);
 				continue;
 			}
@@ -40,7 +40,7 @@ public class RegexRecognition implements Recognition {
 				Term tm = null;
 				if (start != 0) {
 					tm = new Term(realName.substring(0, start), term.getOffe(), term.item());
-					tm.setNature(TMP_NATURE);
+					tm.setNature(IGNORE_NATURE);
 					regexTerms.add(tm);
 				}
 				tm = new Term(matcher.group(), term.getOffe() + start, term.item());
@@ -48,7 +48,7 @@ public class RegexRecognition implements Recognition {
 				regexTerms.add(tm);
 				if (end != realName.length()) {
 					tm = new Term(realName.substring(end), term.getOffe() + end, term.item());
-					tm.setNature(TMP_NATURE);
+					tm.setNature(IGNORE_NATURE);
 					regexTerms.add(tm);
 				}
 			} else {
