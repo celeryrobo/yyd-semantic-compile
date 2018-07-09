@@ -2,6 +2,7 @@ package com.ybnf.compiler.lucene;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -66,7 +67,9 @@ public class SemanticSentence {
 		LOG.info(result.toString());
 		ParserUtils.recognition(lang, result);
 		StringBuilder sb = new StringBuilder();
-		for (org.ansj.domain.Term term : result) {
+		Iterator<org.ansj.domain.Term> iter = result.iterator();
+		while (iter.hasNext()) {
+			org.ansj.domain.Term term = iter.next();
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
 			if (ParserUtils.isKeyword(natureStr)) {
@@ -79,10 +82,13 @@ public class SemanticSentence {
 					sentences.put(type, new HashSet<>());
 				}
 				sentences.get(type).add(name);
-				sb.append(" $" + type + " ");
+				sb.append("$").append(type);
+			}
+			if (iter.hasNext()) {
+				sb.append(" ");
 			}
 		}
-		sentence = sb.toString().trim().replaceAll("\\s+", " ");
+		sentence = sb.toString();
 		LOG.info("Keywords: " + keywords + ", Sentences: " + sentences);
 		LOG.info("Template: " + sentence);
 	}
