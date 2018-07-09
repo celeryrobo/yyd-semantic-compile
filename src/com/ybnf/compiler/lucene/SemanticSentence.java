@@ -1,5 +1,6 @@
 package com.ybnf.compiler.lucene;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -151,7 +152,7 @@ public class SemanticSentence {
 		if (templateEntities.isEmpty()) {
 			sb.append("Template Empty!!!");
 		} else {
-			List<TemplateEntity> templates = templateEntities.stream().sorted((e0, e1) -> {
+			Collections.sort(templateEntities, (e0, e1) -> {
 				float score0 = ParserUtils.distanceScore(sentence, e0.getTemplate());
 				float score1 = ParserUtils.distanceScore(sentence, e1.getTemplate());
 				float r = (float) (score0 - score1);
@@ -162,10 +163,10 @@ public class SemanticSentence {
 				} else {
 					return 0;
 				}
-			}).collect(Collectors.toList());
+			});
 			LOG.info("TemplateEntity : ");
-			templates.forEach(tpl -> LOG.info(tpl.toString()));
-			for (TemplateEntity templateEntity : templates) {
+			templateEntities.forEach(templateEntitie -> LOG.info(templateEntitie.toString()));
+			for (TemplateEntity templateEntity : templateEntities) {
 				try {
 					return compile(templateEntity);
 				} catch (Exception e) {
