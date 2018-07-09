@@ -73,8 +73,6 @@ public class LuceneCompiler implements ICompiler {
 		try (IndexReaderService readerService = new IndexReaderService()) {
 			entities = readerService.search(query);
 		}
-		LOG.info("TemplateEntity : ");
-		entities.forEach(entity -> LOG.info(entity.toString()));
 		return sentence.compile(entities);
 	}
 

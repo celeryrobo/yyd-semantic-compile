@@ -30,6 +30,7 @@ public class SemanticSentence {
 	private String intent = "";
 	private String lang;
 	private String service;
+	private String sentence = null;
 	private Set<String> types;
 	private Set<String> entTypes;
 	private Set<String> varTypes;
@@ -64,11 +65,13 @@ public class SemanticSentence {
 		new YydDicNatureRecognition(varTypes, forests).recognition(result);
 		LOG.info(result.toString());
 		ParserUtils.recognition(lang, result);
+		StringBuilder sb = new StringBuilder();
 		for (org.ansj.domain.Term term : result) {
 			String natureStr = term.getNatureStr();
 			String name = term.getName();
 			if (ParserUtils.isKeyword(natureStr)) {
 				keywords.add(name);
+				sb.append(name);
 			} else if (ParserUtils.isCategory(natureStr)) {
 				String type = natureStr.substring(2);
 				types.add(type);
@@ -76,9 +79,12 @@ public class SemanticSentence {
 					sentences.put(type, new HashSet<>());
 				}
 				sentences.get(type).add(name);
+				sb.append(" $" + type + " ");
 			}
 		}
+		sentence = sb.toString().trim().replaceAll("\\s+", " ");
 		LOG.info("Keywords: " + keywords + ", Sentences: " + sentences);
+		LOG.info("Template: " + sentence);
 	}
 
 	private void initDslSentence(Map<String, Set<String>> sentences) {
@@ -139,7 +145,21 @@ public class SemanticSentence {
 		if (templateEntities.isEmpty()) {
 			sb.append("Template Empty!!!");
 		} else {
-			for (TemplateEntity templateEntity : templateEntities) {
+			List<TemplateEntity> templates = templateEntities.stream().sorted((e0, e1) -> {
+				float score0 = ParserUtils.distanceScore(sentence, e0.getTemplate());
+				float score1 = ParserUtils.distanceScore(sentence, e1.getTemplate());
+				float r = (float) (score0 - score1);
+				if (r > 0F) {
+					return -1;
+				} else if (r < 0F) {
+					return 1;
+				} else {
+					return 0;
+				}
+			}).collect(Collectors.toList());
+			LOG.info("TemplateEntity : ");
+			templates.forEach(tpl -> LOG.info(tpl.toString()));
+			for (TemplateEntity templateEntity : templates) {
 				try {
 					return compile(templateEntity);
 				} catch (Exception e) {
