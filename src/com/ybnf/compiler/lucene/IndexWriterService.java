@@ -14,6 +14,7 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.search.Query;
 import org.nlpcn.commons.lang.tire.domain.Forest;
 import org.nlpcn.commons.lang.util.StringUtil;
 
@@ -51,6 +52,10 @@ public class IndexWriterService extends LuceneService {
 			}
 			entry.getValue().resetTemplates();
 		}
+	}
+
+	public long deleteMany(Query... queries) throws Exception {
+		return writer.deleteDocuments(queries);
 	}
 
 	public long deleteAll() throws Exception {
