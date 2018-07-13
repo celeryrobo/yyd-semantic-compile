@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -152,10 +153,17 @@ public class SemanticSentence {
 		if (templateEntities.isEmpty()) {
 			sb.append("Template Empty!!!");
 		} else {
+			Map<String, Float> scores = new HashMap<>();
 			Collections.sort(templateEntities, (e0, e1) -> {
-				float score0 = ParserUtils.distanceScore(sentence, e0.getTemplate());
-				float score1 = ParserUtils.distanceScore(sentence, e1.getTemplate());
-				float r = (float) (score0 - score1);
+				float r = Optional.ofNullable(scores.get(e0.getTemplate())).orElseGet(() -> {
+					Float score = ParserUtils.distanceScore(sentence, e0.getTemplate());
+					scores.put(e0.getTemplate(), score);
+					return score;
+				}) - Optional.ofNullable(scores.get(e1.getTemplate())).orElseGet(() -> {
+					Float score = ParserUtils.distanceScore(sentence, e1.getTemplate());
+					scores.put(e1.getTemplate(), score);
+					return score;
+				});
 				if (r > 0F) {
 					return -1;
 				} else if (r < 0F) {
