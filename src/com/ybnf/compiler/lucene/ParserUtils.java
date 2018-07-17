@@ -1,5 +1,6 @@
 package com.ybnf.compiler.lucene;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -235,6 +236,54 @@ public class ParserUtils {
 		}
 		int distance = vecs[sourceLen][targetLen];
 		return 1 - (float) distance / Math.max(sourceLen, targetLen);
+	}
+
+	public static float distanceScoreWithTemplate(String sourceTemplate, String targetTemplate) {
+		final String delim = " *";
+		List<String> sources = new ArrayList<>();
+		StringTokenizer sourceTokenizer = new StringTokenizer(sourceTemplate, delim);
+		while (sourceTokenizer.hasMoreTokens()) {
+			String token = sourceTokenizer.nextToken();
+			if (!"".equals(token)) {
+				sources.add(token);
+			}
+		}
+		List<String> targets = new ArrayList<>();
+		StringTokenizer targetTokenizer = new StringTokenizer(targetTemplate, delim);
+		while (targetTokenizer.hasMoreTokens()) {
+			String token = targetTokenizer.nextToken();
+			if (!"".equals(token)) {
+				targets.add(token);
+			}
+		}
+		int sourceSize = sources.size();
+		int targetSize = targets.size();
+		int rowSize = sourceSize + 1;
+		int colSize = targetSize + 1;
+		int[][] vecs = new int[rowSize][colSize];
+		for (int col = 0; col < colSize; col++) {
+			vecs[0][col] = col;
+		}
+		for (int row = 0; row < rowSize; row++) {
+			vecs[row][0] = row;
+		}
+		String source, target;
+		int temp;
+		for (int row = 1; row < rowSize; row++) {
+			source = sources.get(row - 1);
+			for (int col = 1; col < colSize; col++) {
+				target = targets.get(col - 1);
+				if (Objects.equals(source, target)) {
+					temp = 0;
+				} else {
+					temp = 1;
+				}
+				vecs[row][col] = Math.min(temp + vecs[row - 1][col - 1],
+						Math.min(vecs[row][col - 1] + 1, vecs[row - 1][col] + 1));
+			}
+		}
+		int distance = vecs[sourceSize][targetSize];
+		return 1 - (float) distance / Math.max(sourceSize, targetSize);
 	}
 
 	public static boolean isKeyword(String keyword) {

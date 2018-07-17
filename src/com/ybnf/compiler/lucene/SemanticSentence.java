@@ -156,11 +156,11 @@ public class SemanticSentence {
 			Map<String, Float> scores = new HashMap<>();
 			Collections.sort(templateEntities, (e0, e1) -> {
 				float r = Optional.ofNullable(scores.get(e0.getTemplate())).orElseGet(() -> {
-					Float score = ParserUtils.distanceScore(sentence, e0.getTemplate());
+					Float score = ParserUtils.distanceScoreWithTemplate(sentence, e0.getTemplate());
 					scores.put(e0.getTemplate(), score);
 					return score;
 				}) - Optional.ofNullable(scores.get(e1.getTemplate())).orElseGet(() -> {
-					Float score = ParserUtils.distanceScore(sentence, e1.getTemplate());
+					Float score = ParserUtils.distanceScoreWithTemplate(sentence, e1.getTemplate());
 					scores.put(e1.getTemplate(), score);
 					return score;
 				});
