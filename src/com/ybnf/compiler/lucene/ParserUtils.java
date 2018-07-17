@@ -225,11 +225,7 @@ public class ParserUtils {
 			source = sourceStr.charAt(row - 1);
 			for (int col = 1; col < colSize; col++) {
 				target = targetStr.charAt(col - 1);
-				if (source == target) {
-					temp = 0;
-				} else {
-					temp = 1;
-				}
+				temp = source == target ? 0 : 1;
 				vecs[row][col] = Math.min(temp + vecs[row - 1][col - 1],
 						Math.min(vecs[row][col - 1] + 1, vecs[row - 1][col] + 1));
 			}
@@ -273,11 +269,7 @@ public class ParserUtils {
 			source = sources.get(row - 1);
 			for (int col = 1; col < colSize; col++) {
 				target = targets.get(col - 1);
-				if (Objects.equals(source, target)) {
-					temp = 0;
-				} else {
-					temp = 1;
-				}
+				temp = Objects.equals(source, target) ? 0 : 1;
 				vecs[row][col] = Math.min(temp + vecs[row - 1][col - 1],
 						Math.min(vecs[row][col - 1] + 1, vecs[row - 1][col] + 1));
 			}
