@@ -95,8 +95,8 @@ public class ExprService {
 			String sentence = matcher.group();
 			LOG.info("Sentence: " + sentence);
 			float score = ParserUtils.distanceScore(lang, sentence);
-			if (score < 0.4F) {
-				throw new Exception("Semantic Match Failture, Distance Score < 0.4!");
+			if (score < 0.5F) {
+				throw new Exception("Semantic Match Failture, Distance Score < 0.5!");
 			}
 			for (String varName : varNames) {
 				map.put(varName, matcher.group(varName));
