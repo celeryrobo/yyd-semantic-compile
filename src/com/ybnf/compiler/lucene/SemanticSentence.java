@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import org.ansj.domain.Result;
 import org.ansj.library.DicLibrary;
-import org.ansj.splitWord.analysis.IndexAnalysis;
+import org.ansj.splitWord.analysis.DicAnalysis;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
@@ -64,10 +64,9 @@ public class SemanticSentence {
 	}
 
 	private void initSentence(String lang, Forest... forests) {
-		Result result = IndexAnalysis.parse(lang, forests);
+		Result result = DicAnalysis.parse(lang, forests);
 		new YydDicNatureRecognition(varTypes, forests).recognition(result);
 		LOG.info(result.toString());
-		ParserUtils.recognition(lang, result);
 		StringBuilder sb = new StringBuilder();
 		Iterator<org.ansj.domain.Term> iter = result.iterator();
 		while (iter.hasNext()) {

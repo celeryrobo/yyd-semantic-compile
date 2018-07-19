@@ -37,10 +37,20 @@ public class YydDicNatureRecognition implements Recognition {
 				recognition.recognition(result);
 			}
 		}));
+		// reRecognition(result);
+	}
+
+	/**
+	 * 词性重设，为了兼容ansj_seg 5.1.5中存在的不同词库词性互串的问题（暂时保留，以防万一）
+	 * 
+	 * @param result
+	 *            分词后的结果
+	 */
+	@SuppressWarnings("unused")
+	private void reRecognition(Result result) {
 		List<Term> terms = new ArrayList<>();
 		int termSize = 0;
-		for (Term term : result) {
-			// 根据当前场景下的实体词性将分词后与当前场景相关的词提取出来
+		for (Term term : result) { // 根据当前场景下的实体词性将分词后与当前场景相关的词提取出来
 			for (Forest forest : forests) {
 				String[] params = UserDicNatureRecognition.getParams(forest, term.getName());
 				Optional.ofNullable(params).map(param -> param[0]).map(natureName -> {
@@ -52,8 +62,7 @@ public class YydDicNatureRecognition implements Recognition {
 					return null;
 				}).ifPresent(tm -> terms.add(tm));
 			}
-			int size = terms.size();
-			// 判断是否提取成功，如果成功则忽略该词（因为提取过程中会将该词一并提取），提取失败则判断该词性是否是关键词或实体词，如果是则将词性设置为ignore，否则按原词性提取
+			int size = terms.size(); // 判断是否提取成功，如果成功则忽略该词（因为提取过程中会将该词一并提取），提取失败则判断该词性是否是关键词或实体词，如果是则将词性设置为ignore，否则按原词性提取
 			if (termSize == size) {
 				Optional.of(term).filter(
 						e -> ParserUtils.isKeyword(e.getNatureStr()) || ParserUtils.isCategory(e.getNatureStr()))
@@ -63,8 +72,7 @@ public class YydDicNatureRecognition implements Recognition {
 			} else {
 				termSize = size;
 			}
-		}
-		// 替换分词结果
+		} // 替换分词结果
 		result.setTerms(terms);
 	}
 }
