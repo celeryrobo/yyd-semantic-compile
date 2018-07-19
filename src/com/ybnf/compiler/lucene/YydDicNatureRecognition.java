@@ -37,16 +37,9 @@ public class YydDicNatureRecognition implements Recognition {
 				recognition.recognition(result);
 			}
 		}));
-		// reRecognition(result);
+		reRecognition(result);
 	}
 
-	/**
-	 * 词性重设，为了兼容ansj_seg 5.1.5中存在的不同词库词性互串的问题（暂时保留，以防万一）
-	 * 
-	 * @param result
-	 *            分词后的结果
-	 */
-	@SuppressWarnings("unused")
 	private void reRecognition(Result result) {
 		List<Term> terms = new ArrayList<>();
 		int termSize = 0;

@@ -289,14 +289,6 @@ public class ParserUtils {
 		return category.startsWith("c:");
 	}
 
-	/**
-	 * 兼容IndexAnalysis分析结果去子串的问题的方法（暂时保留，以防万一）
-	 * 
-	 * @param lang
-	 *            分词语料
-	 * @param result
-	 *            IndexAnalysis的分词结果
-	 */
 	public static void recognition(String lang, Result result) {
 		Iterator<Term> terms = result.iterator();
 		int[] arr = new int[lang.length()];
