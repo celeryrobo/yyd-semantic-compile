@@ -43,16 +43,21 @@ public interface SemanticContext {
 	/**
 	 * 设置当前会话的本地零时变量
 	 * 
-	 * @param localVar
+	 * @param localKey
+	 *            本地变量key
+	 * @param localValue
+	 *            本地变量value
 	 */
-	void setLocalVar(Object localVar);
+	void setLocalVar(Object localKey, Object localValue);
 
 	/**
 	 * 获取当前会话的本地零时变量
 	 * 
-	 * @return Object
+	 * @param localKey
+	 *            本地变量key
+	 * @return Object 本地变量value
 	 */
-	Object getLocalVar();
+	Object getLocalVar(Object localKey);
 
 	/**
 	 * 获取当前会话的用户标识
