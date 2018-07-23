@@ -58,6 +58,9 @@ public class ExprService {
 	public Map<String, String> compile(String template, String lang) throws Exception {
 		List<String> varNames = new ArrayList<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
+		Map<String, String> params = new HashMap<>();
+		String varCommonName = null;
+		int beginIndex = 0;
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (token.startsWith("$")) {
@@ -67,17 +70,29 @@ public class ExprService {
 				case "+":
 				case "*":
 					varName = varName.substring(0, nameLength - 1);
-					if (!includes.containsKey(varName)) {
-						includes.put(varName, new Regex(".+"));
-					}
+					varCommonName = varName;
 				default:
 					varNames.add(varName);
 					break;
 				}
 			} else if (!lang.contains(token)) {
 				throw new Exception("Semantic Match Failture, Keyword is not exsit!");
+			} else {
+				if (varCommonName != null) {
+					params.put(varCommonName, lang.substring(beginIndex, lang.indexOf(token, beginIndex)));
+					varCommonName = null;
+				}
+				beginIndex = lang.indexOf(token, beginIndex) + token.length();
 			}
 		}
+		if (varCommonName != null) {
+			params.put(varCommonName, lang.substring(beginIndex, lang.length()));
+		}
+		params.forEach((k, v) -> {
+			if (!includes.containsKey(k)) {
+				includes.put(k, new Regex(v));
+			}
+		});
 		Expr expr = ParserUtils.generate(template, includes);
 		if (expr == null) {
 			throw new Exception("Semantic Match Failture !");
