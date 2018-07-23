@@ -58,6 +58,7 @@ public class ExprService {
 
 	public Map<String, String> compile(String template, String lang) throws Exception {
 		List<String> varNames = new ArrayList<>();
+		List<String> varCommonNames = new ArrayList<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
 		StringJoiner sj = new StringJoiner("|");
 		String varName = null;
@@ -71,6 +72,7 @@ public class ExprService {
 				case "+":
 				case "*":
 					varName = varName.substring(0, nameLength - 1);
+					varCommonNames.add(varName);
 				default:
 					varNames.add(varName);
 					break;
@@ -89,7 +91,7 @@ public class ExprService {
 			sj.add(lang.substring(beginIndex, lang.length()));
 		}
 		Expr anonymousOrExpr = ParserUtils.generate(sj.toString(), null);
-		varNames.forEach(e -> {
+		varCommonNames.forEach(e -> {
 			if (!includes.containsKey(e)) {
 				includes.put(e, anonymousOrExpr);
 			}
