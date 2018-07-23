@@ -59,18 +59,17 @@ public class ExprService {
 		List<String> varNames = new ArrayList<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
 		Map<String, String> params = new HashMap<>();
-		String varCommonName = null;
+		String varName = null;
 		int beginIndex = 0;
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (token.startsWith("$")) {
-				String varName = token.substring(1);
+				varName = token.substring(1);
 				int nameLength = varName.length();
 				switch (varName.substring(nameLength - 1)) {
 				case "+":
 				case "*":
 					varName = varName.substring(0, nameLength - 1);
-					varCommonName = varName;
 				default:
 					varNames.add(varName);
 					break;
@@ -78,19 +77,22 @@ public class ExprService {
 			} else if (!lang.contains(token)) {
 				throw new Exception("Semantic Match Failture, Keyword is not exsit!");
 			} else {
-				if (varCommonName != null) {
-					params.put(varCommonName, lang.substring(beginIndex, lang.indexOf(token, beginIndex)));
-					varCommonName = null;
+				if (varName != null) {
+					params.put(varName, lang.substring(beginIndex, lang.indexOf(token, beginIndex)));
+					varName = null;
 				}
 				beginIndex = lang.indexOf(token, beginIndex) + token.length();
 			}
 		}
-		if (varCommonName != null) {
-			params.put(varCommonName, lang.substring(beginIndex, lang.length()));
+		if (varName != null) {
+			params.put(varName, lang.substring(beginIndex, lang.length()));
 		}
-		params.forEach((k, v) -> {
-			if (!includes.containsKey(k)) {
-				includes.put(k, new Regex(v));
+		varNames.forEach(e -> {
+			if (!includes.containsKey(e)) {
+				String param = params.get(e);
+				if (param != null) {
+					includes.put(e, new Regex(param));
+				}
 			}
 		});
 		Expr expr = ParserUtils.generate(template, includes);
