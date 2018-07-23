@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -58,7 +59,7 @@ public class ExprService {
 	public Map<String, String> compile(String template, String lang) throws Exception {
 		List<String> varNames = new ArrayList<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
-		Map<String, String> params = new HashMap<>();
+		StringJoiner sj = new StringJoiner("|");
 		String varName = null;
 		int beginIndex = 0;
 		while (tokenizer.hasMoreTokens()) {
@@ -78,21 +79,19 @@ public class ExprService {
 				throw new Exception("Semantic Match Failture, Keyword is not exsit!");
 			} else {
 				if (varName != null) {
-					params.put(varName, lang.substring(beginIndex, lang.indexOf(token, beginIndex)));
+					sj.add(lang.substring(beginIndex, lang.indexOf(token, beginIndex)));
 					varName = null;
 				}
 				beginIndex = lang.indexOf(token, beginIndex) + token.length();
 			}
 		}
 		if (varName != null) {
-			params.put(varName, lang.substring(beginIndex, lang.length()));
+			sj.add(lang.substring(beginIndex, lang.length()));
 		}
+		Expr anonymousOrExpr = ParserUtils.generate(sj.toString(), null);
 		varNames.forEach(e -> {
 			if (!includes.containsKey(e)) {
-				String param = params.get(e);
-				if (param != null) {
-					includes.put(e, new Regex(param));
-				}
+				includes.put(e, anonymousOrExpr);
 			}
 		});
 		Expr expr = ParserUtils.generate(template, includes);
