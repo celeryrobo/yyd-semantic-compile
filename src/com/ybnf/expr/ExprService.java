@@ -82,11 +82,15 @@ public class ExprService {
 			} else if (!lang.contains(token)) {
 				throw new Exception("Semantic Match Failture, Keyword is not exsit!");
 			} else {
+				int index = lang.indexOf(token, beginIndex);
+				if (index < 0) {
+					throw new Exception("Semantic Match Failture, Template's pattern is Error!");
+				}
 				if (varName != null) {
-					params.put(varName, lang.substring(beginIndex, lang.indexOf(token, beginIndex)));
+					params.put(varName, lang.substring(beginIndex, index));
 					varName = null;
 				}
-				beginIndex = lang.indexOf(token, beginIndex) + token.length();
+				beginIndex = index + token.length();
 			}
 		}
 		if (varName != null) {
