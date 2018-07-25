@@ -22,7 +22,6 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.nlpcn.commons.lang.tire.domain.Forest;
-import org.nlpcn.commons.lang.util.StringUtil;
 
 import com.ybnf.compiler.beans.LuceneCompileResult;
 import com.ybnf.compiler.beans.YbnfCompileResult;
@@ -101,9 +100,9 @@ public class SemanticSentence {
 		}
 		try {
 			for (Entry<String, Set<String>> entry : sentences.entrySet()) {
-				List<String> value = entry.getValue().stream().sorted((e0, e1) -> e1.length() - e0.length())
-						.collect(Collectors.toList());
-				dsl.include(entry.getKey(), ParserUtils.generate(StringUtil.joiner(value, "|"), null));
+				String value = entry.getValue().stream().sorted((e0, e1) -> e1.length() - e0.length())
+						.collect(Collectors.joining("|"));
+				dsl.include(entry.getKey(), ParserUtils.generate(value, null));
 			}
 		} catch (Exception e) {
 		}
