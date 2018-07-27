@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.ybnf.compiler.lucene.ParserUtils;
-import com.ybnf.expr.ExprService;
+import com.ybnf.expr.ExprServiceImpl;
 
 class U {
 	private String service;
@@ -49,7 +49,7 @@ public class Main {
 		System.out.println(r);
 
 		long start = System.currentTimeMillis();
-		ExprService service = new ExprService();
+		ExprServiceImpl service = new ExprServiceImpl();
 		Map<String, String> o = service.compile("$number", "十二点五六");
 		System.out.println(o);
 		System.out.println(System.currentTimeMillis() - start);

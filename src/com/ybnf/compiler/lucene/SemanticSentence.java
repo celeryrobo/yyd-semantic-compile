@@ -26,6 +26,7 @@ import org.nlpcn.commons.lang.tire.domain.Forest;
 import com.ybnf.compiler.beans.LuceneCompileResult;
 import com.ybnf.compiler.beans.YbnfCompileResult;
 import com.ybnf.expr.ExprService;
+import com.ybnf.expr.ExprServiceDsl;
 
 public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
@@ -48,7 +49,7 @@ public class SemanticSentence {
 		this.types = new HashSet<>();
 		this.keywords = new HashSet<>();
 		this.sentences = new HashMap<>();
-		this.dsl = new ExprService();
+		this.dsl = new ExprServiceDsl();
 		int entTypeSize = entTypes.size();
 		Forest[] forests = new Forest[entTypeSize + 2];
 		Forest[] dics = DicLibrary.gets(this.entTypes);
@@ -102,7 +103,7 @@ public class SemanticSentence {
 			for (Entry<String, Set<String>> entry : sentences.entrySet()) {
 				String value = entry.getValue().stream().sorted((e0, e1) -> e1.length() - e0.length())
 						.collect(Collectors.joining("|"));
-				dsl.include(entry.getKey(), ParserUtils.generate(value, null));
+				dsl.include(entry.getKey(), value);
 			}
 		} catch (Exception e) {
 		}
