@@ -38,13 +38,13 @@ public class ExprServiceDsl implements ExprService {
 
 	@Override
 	public Map<String, String> compile(String template, String lang) throws Exception {
-		LOG.info("REGEX: " + template);
-		LOG.info("Lang: " + lang);
 		Map<String, String> result = dsl.map("lang", template).compile("$lang", lang);
 		if (result == null) {
 			throw new Exception("Semantic Match Failture !");
 		}
 		String sentence = result.remove("lang");
+		LOG.info("REGEX: " + template);
+		LOG.info("Lang: " + lang);
 		LOG.info("Sentence: " + sentence);
 		float score = ParserUtils.distanceScore(lang, sentence);
 		if (score < 0.5F) {
