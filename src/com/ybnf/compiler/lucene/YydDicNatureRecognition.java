@@ -45,6 +45,9 @@ public class YydDicNatureRecognition implements Recognition {
 		List<Term> terms = new ArrayList<>();
 		int termSize = 0;
 		for (Term term : result) { // 根据当前场景下的实体词性将分词后与当前场景相关的词提取出来
+			if (term.natrue() == RegexRecognition.IGNORE_NATURE) {
+				continue;
+			}
 			for (Forest forest : forests) {
 				String[] params = UserDicNatureRecognition.getParams(forest, term.getName());
 				Optional.ofNullable(params).map(param -> param[0]).map(natureName -> {
