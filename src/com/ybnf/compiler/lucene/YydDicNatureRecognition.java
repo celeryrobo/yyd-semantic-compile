@@ -32,6 +32,7 @@ public class YydDicNatureRecognition implements Recognition {
 
 	@Override
 	public void recognition(Result result) {
+		new UserDicNatureRecognition(forests).recognition(result);
 		varTypes.forEach(varType -> Optional.ofNullable(RECOGNITIONS.get(varType)).ifPresent(recognitions -> {
 			for (Recognition recognition : recognitions) {
 				recognition.recognition(result);
