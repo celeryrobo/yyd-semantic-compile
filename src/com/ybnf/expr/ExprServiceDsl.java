@@ -22,6 +22,8 @@ public class ExprServiceDsl implements ExprService {
 			number = new OR(new REGEX("\\d+"), new OneOrMany(number));
 			number = new AND(number, new SELECTABLE(new AND(new OR(new WORD("点"), new WORD(".")), number)));
 			DSL_INCLUDE_SERVICE.include("number", number);
+			DSL_INCLUDE_SERVICE.include("enChar", new REGEX("\\w"));
+			DSL_INCLUDE_SERVICE.include("cnChar", new REGEX("\\p{script=Han}"));
 		} catch (Exception e) {
 		}
 	}
