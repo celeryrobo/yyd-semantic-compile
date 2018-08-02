@@ -14,7 +14,7 @@ import com.yyd.dsl.parser.impl.SELECTABLE;
 import com.yyd.dsl.parser.impl.WORD;
 
 public class ExprServiceDsl implements ExprService {
-	private static final Logger LOG = Logger.getLogger(ExprServiceImpl.class.getSimpleName());
+	private static final Logger LOG = Logger.getLogger(ExprServiceDsl.class.getSimpleName());
 	public static final DslService DSL_INCLUDE_SERVICE = new DslService();
 	static {
 		try {
