@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import org.ansj.domain.Result;
 import org.ansj.domain.Term;
@@ -138,6 +139,8 @@ public class ParserUtils {
 		}
 	}
 
+	private static final Pattern COMMON_PATTERN = Pattern.compile("\\(\\?\\<\\w+\\>\\.\\+\\)");
+
 	private static String tplParse(Stack<Expr> stacks, StringTokenizer tokenizer, Map<String, Expr> includes)
 			throws Exception {
 		String token = tokenizer.nextToken();
@@ -189,11 +192,23 @@ public class ParserUtils {
 			throw new Exception("group parser error");
 		}
 		case "*": {
-			stacks.push(new ZeroOrMany(stacks.pop()));
+			Expr expr = stacks.pop();
+			String regex = expr.expr();
+			boolean isCommon = COMMON_PATTERN.matcher(regex).matches();
+			if (!isCommon) {
+				expr = new ZeroOrMany(expr);
+			}
+			stacks.push(expr);
 			break;
 		}
 		case "+": {
-			stacks.push(new OneOrMany(stacks.pop()));
+			Expr expr = stacks.pop();
+			String regex = expr.expr();
+			boolean isCommon = COMMON_PATTERN.matcher(regex).matches();
+			if (!isCommon) {
+				expr = new OneOrMany(expr);
+			}
+			stacks.push(expr);
 			break;
 		}
 		case " ":

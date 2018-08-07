@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -58,22 +57,18 @@ public class ExprServiceImpl implements ExprService {
 
 	public Map<String, String> compile(String template, String lang) throws Exception {
 		List<String> varNames = new ArrayList<>();
-		Map<String, String> varCommonNames = new HashMap<>();
-		Map<String, String> params = new HashMap<>();
 		StringTokenizer tokenizer = new StringTokenizer(template, " ");
 		String varName = null;
-		int beginIndex = 0;
 		while (tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();
 			if (token.startsWith("$")) {
-				String oldVarName = varName;
 				varName = token.substring(1);
 				int nameLength = varName.length();
 				switch (varName.substring(nameLength - 1)) {
 				case "+":
 				case "*": {
 					varName = varName.substring(0, nameLength - 1);
-					varCommonNames.put(varName, oldVarName);
+					includes.put(varName, new Regex(".+"));
 				}
 				default:
 					varNames.add(varName);
@@ -81,45 +76,8 @@ public class ExprServiceImpl implements ExprService {
 				}
 			} else if (!lang.contains(token)) {
 				throw new Exception("Semantic Match Failture, Keyword is not exsit!");
-			} else {
-				int index = lang.indexOf(token, beginIndex);
-				if (index < 0) {
-					throw new Exception("Semantic Match Failture, Template's pattern is Error!");
-				}
-				if (varName != null) {
-					params.put(varName, lang.substring(beginIndex, index));
-					varName = null;
-				}
-				beginIndex = index + token.length();
 			}
 		}
-		if (varName != null) {
-			params.put(varName, lang.substring(beginIndex, lang.length()));
-		}
-		varCommonNames.forEach((k, v) -> {
-			if (!includes.containsKey(k)) {
-				String param = params.get(k);
-				Expr expr = null;
-				if (v != null && null != (expr = includes.get(v))) {
-					String[] arr = param.split(expr.expr());
-					StringJoiner sj = new StringJoiner("|");
-					for (String w : arr) {
-						if (!"".equals(w)) {
-							sj.add(w);
-						}
-					}
-					param = sj.toString();
-					try {
-						expr = ParserUtils.generate(param, includes);
-					} catch (Exception e) {
-						expr = new Regex(".+");
-					}
-				} else {
-					expr = new Word(param);
-				}
-				includes.put(k, expr);
-			}
-		});
 		Expr expr = ParserUtils.generate(template, includes);
 		if (expr == null) {
 			throw new Exception("Semantic Match Failture !");
