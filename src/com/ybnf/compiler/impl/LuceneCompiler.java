@@ -18,7 +18,6 @@ import com.ybnf.compiler.lucene.SemanticIntent;
 import com.ybnf.compiler.lucene.SemanticSentence;
 import com.ybnf.compiler.lucene.SemanticService;
 import com.ybnf.compiler.lucene.TemplateEntity;
-import com.ybnf.semantic.SemanticCallable;
 
 public class LuceneCompiler implements ICompiler {
 	private static final Logger LOG = Logger.getLogger(LuceneCompiler.class.getSimpleName());
@@ -75,9 +74,4 @@ public class LuceneCompiler implements ICompiler {
 		}
 		return sentence.compile(entities);
 	}
-
-	@Override
-	public void setSemanticCallable(SemanticCallable semanticCallable) {
-	}
-
 }

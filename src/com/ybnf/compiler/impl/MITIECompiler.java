@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.ybnf.compiler.ICompiler;
 import com.ybnf.compiler.beans.YbnfCompileResult;
-import com.ybnf.semantic.SemanticCallable;
 
 import edu.mit.ll.mitie.EntityMention;
 import edu.mit.ll.mitie.EntityMentionVector;
@@ -103,10 +102,4 @@ public class MITIECompiler implements ICompiler {
 		Map<String, String> objects = namedEntityExtractor(text);
 		return new YbnfCompileResult(text, "0.1", "UTF-8", service, objects, slots);
 	}
-
-	@Override
-	public void setSemanticCallable(SemanticCallable semanticCallable) {
-
-	}
-
 }
