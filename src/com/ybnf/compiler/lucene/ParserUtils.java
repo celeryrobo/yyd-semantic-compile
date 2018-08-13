@@ -332,7 +332,7 @@ public class ParserUtils {
 					}
 				} else {
 					for (int i = position; i < position + length; i++) {
-						if (0 == arr[i] || 2 == arr[i]) {
+						if (0 == arr[i]) {// || 2 == arr[i]
 							arr[i] = 2;
 						} else {
 							isRemoved = true;
