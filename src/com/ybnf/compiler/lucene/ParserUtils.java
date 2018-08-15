@@ -31,10 +31,12 @@ public class ParserUtils {
 	private static final Text CHOICES_RIGHT = new Text("]");
 	private static final Text GROUP_LEFT = new Text("(");
 	private static final Text GROUP_RIGHT = new Text(")");
+	private static final Text COMMON_LEFT = new Text("<");
+	private static final Text COMMON_RIGHT = new Text(">");
 
 	public static TemplateBuilder parse(String lang) throws Exception {
 		String grammar = lang.replaceAll("\\s+", " ").trim();
-		StringTokenizer tokenizer = new StringTokenizer(grammar, "$[]()| ", true);
+		StringTokenizer tokenizer = new StringTokenizer(grammar, "$[]()<>| ", true);
 		Stack<Node<?>> stack = new Stack<>();
 		while (tokenizer.hasMoreTokens()) {
 			stack.push(parser(stack, tokenizer));
@@ -79,6 +81,28 @@ public class ParserUtils {
 								group.add(kvStack.pop());
 							}
 							return group;
+						}
+						kvStack.push(node);
+					}
+				}
+				stack.push(node);
+			}
+			throw new Exception("group parser error !");
+		case "<":
+			stack.push(COMMON_LEFT);
+			while (tokenizer.hasMoreTokens()) {
+				Node<?> node = parser(stack, tokenizer);
+				if (COMMON_RIGHT.equals(node)) {
+					while (true) {
+						node = stack.pop();
+						if (GROUP_LEFT.equals(node)) {
+							if (kvStack.size() == 1) {
+								node = kvStack.pop();
+								if (node instanceof Text) {
+									return new Varname(node);
+								}
+							}
+							throw new Exception("group parser error !");
 						}
 						kvStack.push(node);
 					}
