@@ -95,11 +95,11 @@ public class ParserUtils {
 				if (COMMON_RIGHT.equals(node)) {
 					while (true) {
 						node = stack.pop();
-						if (GROUP_LEFT.equals(node)) {
+						if (COMMON_LEFT.equals(node)) {
 							if (kvStack.size() == 1) {
 								node = kvStack.pop();
 								if (node instanceof Text) {
-									return new Varname(node);
+									return node;
 								}
 							}
 							throw new Exception("group parser error !");
