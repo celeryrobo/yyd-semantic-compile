@@ -14,26 +14,40 @@ import edu.mit.ll.mitie.TextCategorizer;
 import edu.mit.ll.mitie.TotalWordFeatureExtractor;
 
 public class MITIECompiler extends MLCompiler {
-	private static Map<String, TextCategorizer> textCategorizers = new HashMap<>();
+	private static Map<String, TextCategorizer> serviceCategorizers = new HashMap<>();
+	private static Map<String, TextCategorizer> intentCategorizers = new HashMap<>();
 	private static Map<String, NamedEntityExtractor> namedEntityExtractors = new HashMap<>();
 	private static TotalWordFeatureExtractor totalWordFeatureExtractor = null; // 公用语言模型（MITIE lib yyd自定义）
-	private TextCategorizer textCategorizer = null;
+	private TextCategorizer serviceCategorizer = null;
+	private TextCategorizer intentCategorizer = null;
 	private NamedEntityExtractor namedEntityExtractor = null;
 	private StringVector possibleTags;
 
-	public MITIECompiler(String categoryFilename, String featureExtractorFilename) {
-		this(categoryFilename, null, featureExtractorFilename);
+	public MITIECompiler(String serviceCategoryFilename, String featureExtractorFilename) {
+		this(serviceCategoryFilename, null, null, featureExtractorFilename);
 	}
 
-	public MITIECompiler(String categoryFilename, String namedEntityFilename, String featureExtractorFilename) {
+	public MITIECompiler(String serviceCategoryFilename, String intentCategoryFilename, String namedEntityFilename,
+			String featureExtractorFilename) {
+		// 公用语言模型初始化
 		if (totalWordFeatureExtractor == null) {
 			totalWordFeatureExtractor = new TotalWordFeatureExtractor(featureExtractorFilename);
 		}
-		textCategorizer = textCategorizers.get(categoryFilename);
-		if (textCategorizer == null) {
-			textCategorizer = new TextCategorizer(categoryFilename);
-			textCategorizers.put(categoryFilename, textCategorizer);
+		// 场景分类模型初始化
+		serviceCategorizer = serviceCategorizers.get(serviceCategoryFilename);
+		if (serviceCategorizer == null) {
+			serviceCategorizer = new TextCategorizer(serviceCategoryFilename);
+			serviceCategorizers.put(serviceCategoryFilename, serviceCategorizer);
 		}
+		// 意图分类模型初始化
+		if (intentCategoryFilename != null) {
+			intentCategorizer = intentCategorizers.get(intentCategoryFilename);
+			if (intentCategorizer == null) {
+				intentCategorizer = new TextCategorizer(intentCategoryFilename);
+				intentCategorizers.put(intentCategoryFilename, intentCategorizer);
+			}
+		}
+		// 命名实体识别模型初始化
 		if (namedEntityFilename != null) {
 			namedEntityExtractor = namedEntityExtractors.get(namedEntityFilename);
 			if (namedEntityExtractor == null) {
@@ -50,7 +64,7 @@ public class MITIECompiler extends MLCompiler {
 		for (int i = 0; i < lang.length(); i++) {
 			sv.add(lang.substring(i, i + 1));
 		}
-		SDPair pair = textCategorizer.categorizeDoc(sv, totalWordFeatureExtractor);
+		SDPair pair = serviceCategorizer.categorizeDoc(sv, totalWordFeatureExtractor);
 		String service = pair.getFirst();
 		if (0.3d > pair.getSecond()) {
 			throw new Exception("MITIE Service match fail! (" + service + "'s score is less than 0.3)");
@@ -60,7 +74,19 @@ public class MITIECompiler extends MLCompiler {
 
 	@Override
 	protected String intent(String lang) throws Exception {
-		return null;
+		if (intentCategorizer == null) {
+			return null;
+		}
+		StringVector sv = new StringVector();
+		for (int i = 0; i < lang.length(); i++) {
+			sv.add(lang.substring(i, i + 1));
+		}
+		SDPair pair = intentCategorizer.categorizeDoc(sv, totalWordFeatureExtractor);
+		String service = pair.getFirst();
+		if (0.3d > pair.getSecond()) {
+			throw new Exception("MITIE Intent match fail! (" + service + "'s score is less than 0.3)");
+		}
+		return pair.getFirst();
 	}
 
 	@Override
