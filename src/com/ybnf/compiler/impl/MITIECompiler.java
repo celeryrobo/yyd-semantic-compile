@@ -3,8 +3,7 @@ package com.ybnf.compiler.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ybnf.compiler.ICompiler;
-import com.ybnf.compiler.beans.YbnfCompileResult;
+import com.ybnf.compiler.MLCompiler;
 
 import edu.mit.ll.mitie.EntityMention;
 import edu.mit.ll.mitie.EntityMentionVector;
@@ -14,7 +13,7 @@ import edu.mit.ll.mitie.StringVector;
 import edu.mit.ll.mitie.TextCategorizer;
 import edu.mit.ll.mitie.TotalWordFeatureExtractor;
 
-public class MITIECompiler implements ICompiler {
+public class MITIECompiler extends MLCompiler {
 	private static Map<String, TextCategorizer> textCategorizers = new HashMap<>();
 	private static Map<String, NamedEntityExtractor> namedEntityExtractors = new HashMap<>();
 	private static TotalWordFeatureExtractor totalWordFeatureExtractor = null; // 公用语言模型（MITIE lib yyd自定义）
@@ -45,15 +44,27 @@ public class MITIECompiler implements ICompiler {
 		}
 	}
 
-	private SDPair categorizer(String lang) {
+	@Override
+	protected String service(String lang) throws Exception {
 		StringVector sv = new StringVector();
 		for (int i = 0; i < lang.length(); i++) {
 			sv.add(lang.substring(i, i + 1));
 		}
-		return textCategorizer.categorizeDoc(sv, totalWordFeatureExtractor);
+		SDPair pair = textCategorizer.categorizeDoc(sv, totalWordFeatureExtractor);
+		String service = pair.getFirst();
+		if (0.3d > pair.getSecond()) {
+			throw new Exception("MITIE Service match fail! (" + service + "'s score is less than 0.3)");
+		}
+		return pair.getFirst();
 	}
 
-	private Map<String, String> namedEntityExtractor(String lang) {
+	@Override
+	protected String intent(String lang) throws Exception {
+		return null;
+	}
+
+	@Override
+	protected Map<String, String> entities(String lang) throws Exception {
 		Map<String, String> result = new HashMap<>();
 		if (namedEntityExtractor == null) {
 			return result;
@@ -76,30 +87,5 @@ public class MITIECompiler implements ICompiler {
 			}
 		}
 		return result;
-	}
-
-	@Override
-	public YbnfCompileResult compile(String text) throws Exception {
-		SDPair pair = categorizer(text);
-		String[] si = pair.getFirst().split(":", 2);
-		String service = "";
-		String intent = null;
-		if (si.length > 1) {
-			service = si[0];
-			intent = si[1];
-		} else if (si.length == 1) {
-			service = si[0];
-		} else {
-			throw new Exception("MITIE Service and Intent is error!");
-		}
-		if (0.3d > pair.getSecond()) {
-			throw new Exception("MITIE Service match fail! (" + service + "'s score is less than 0.3)");
-		}
-		Map<String, String> slots = new HashMap<>();
-		if (intent != null) {
-			slots.put("intent", intent);
-		}
-		Map<String, String> objects = namedEntityExtractor(text);
-		return new YbnfCompileResult(text, "0.1", "UTF-8", service, objects, slots);
 	}
 }
