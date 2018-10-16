@@ -8,9 +8,6 @@ public abstract class MLCompiler implements ICompiler {
 	@Override
 	public YbnfCompileResult compile(String lang) throws Exception {
 		String service = service(lang);
-		if (service == null) {
-			throw new Exception("MITIE Service and Intent is error!");
-		}
 		String intent = intent(lang);
 		Map<String, String> slots = new HashMap<>();
 		if (intent != null) {

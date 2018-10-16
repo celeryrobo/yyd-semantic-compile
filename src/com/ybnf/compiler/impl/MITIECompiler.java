@@ -27,6 +27,10 @@ public class MITIECompiler extends MLCompiler {
 		this(serviceCategoryFilename, null, null, featureExtractorFilename);
 	}
 
+	public MITIECompiler(String intentCategoryFilename, String namedEntityFilename, String featureExtractorFilename) {
+		this(null, intentCategoryFilename, namedEntityFilename, featureExtractorFilename);
+	}
+
 	public MITIECompiler(String serviceCategoryFilename, String intentCategoryFilename, String namedEntityFilename,
 			String featureExtractorFilename) {
 		// 公用语言模型初始化
@@ -34,10 +38,12 @@ public class MITIECompiler extends MLCompiler {
 			totalWordFeatureExtractor = new TotalWordFeatureExtractor(featureExtractorFilename);
 		}
 		// 场景分类模型初始化
-		serviceCategorizer = serviceCategorizers.get(serviceCategoryFilename);
-		if (serviceCategorizer == null) {
-			serviceCategorizer = new TextCategorizer(serviceCategoryFilename);
-			serviceCategorizers.put(serviceCategoryFilename, serviceCategorizer);
+		if (serviceCategoryFilename != null) {
+			serviceCategorizer = serviceCategorizers.get(serviceCategoryFilename);
+			if (serviceCategorizer == null) {
+				serviceCategorizer = new TextCategorizer(serviceCategoryFilename);
+				serviceCategorizers.put(serviceCategoryFilename, serviceCategorizer);
+			}
 		}
 		// 意图分类模型初始化
 		if (intentCategoryFilename != null) {
@@ -60,6 +66,9 @@ public class MITIECompiler extends MLCompiler {
 
 	@Override
 	protected String service(String lang) throws Exception {
+		if (serviceCategorizer == null) {
+			return null;
+		}
 		StringVector sv = new StringVector();
 		for (int i = 0; i < lang.length(); i++) {
 			sv.add(lang.substring(i, i + 1));
