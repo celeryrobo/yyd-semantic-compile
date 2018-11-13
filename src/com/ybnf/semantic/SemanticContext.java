@@ -65,4 +65,10 @@ public interface SemanticContext {
 	 * @return String
 	 */
 	String getUserIdentify();
+
+	/**
+	 * 清除当前用户上下文
+	 * 
+	 */
+	void clear();
 }
