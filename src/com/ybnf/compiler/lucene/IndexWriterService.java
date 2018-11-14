@@ -35,7 +35,7 @@ public class IndexWriterService extends LuceneService {
 	public void addTemplateEntity(TemplateEntity entity) throws Exception {
 		Document doc = new Document();
 		doc.add(new StringField("id", entity.getId().toString(), Store.YES));
-		doc.add(new StringField("companyId", entity.getCompanyId().toString(), Store.YES));
+		doc.add(new StringField("appId", entity.getAppId().toString(), Store.YES));
 		doc.add(new StringField("service", entity.getService(), Store.YES));
 		doc.add(new StringField("intent", entity.getIntent(), Store.YES));
 		doc.add(new TextField("template", entity.getTemplate(), Store.YES));

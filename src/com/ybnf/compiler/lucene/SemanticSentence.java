@@ -114,7 +114,7 @@ public class SemanticSentence {
 		return this;
 	}
 
-	public Query buildQuery(Integer companyId) {
+	public Query buildQuery(Integer appId) {
 		if (keywords.isEmpty() && types.isEmpty()) {
 			return null;
 		}
@@ -128,8 +128,8 @@ public class SemanticSentence {
 		}
 		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
 		if ("QA".equals(service)) {
-			String companyIdStr = Objects.toString(companyId, "0");
-			booleanBuilder.add(new TermQuery(new Term("companyId", companyIdStr)), Occur.MUST);
+			String appIdStr = Objects.toString(appId, "0");
+			booleanBuilder.add(new TermQuery(new Term("appId", appIdStr)), Occur.MUST);
 		}
 		return booleanBuilder.build();
 	}

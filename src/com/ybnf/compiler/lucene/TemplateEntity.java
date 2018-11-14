@@ -2,19 +2,19 @@ package com.ybnf.compiler.lucene;
 
 public class TemplateEntity {
 	private Integer id;
-	private Integer companyId;
+	private Integer appId;
 	private String service;
 	private String intent;
 	private String template;
 	private float score;
 
-	public TemplateEntity(Integer id, Integer companyId, String service, String intent, String template) {
-		this(id, companyId, service, intent, template, 0);
+	public TemplateEntity(Integer id, Integer appId, String service, String intent, String template) {
+		this(id, appId, service, intent, template, 0);
 	}
 
-	public TemplateEntity(Integer id, Integer companyId, String service, String intent, String template, float score) {
+	public TemplateEntity(Integer id, Integer appId, String service, String intent, String template, float score) {
 		this.id = id;
-		this.companyId = companyId;
+		this.appId = appId;
 		this.service = service;
 		this.intent = intent;
 		this.template = template;
@@ -25,8 +25,8 @@ public class TemplateEntity {
 		return id;
 	}
 
-	public Integer getCompanyId() {
-		return companyId;
+	public Integer getAppId() {
+		return appId;
 	}
 
 	public String getService() {
@@ -49,7 +49,7 @@ public class TemplateEntity {
 	public String toString() {
 		StringBuilder builder = new StringBuilder("{");
 		builder.append("id=").append(id).append(", ");
-		builder.append("companyId=").append(companyId).append(", ");
+		builder.append("appId=").append(appId).append(", ");
 		builder.append("service=").append(service).append(", ");
 		builder.append("intent=").append(intent).append(", ");
 		builder.append("template=").append(template).append(", ");

@@ -22,7 +22,7 @@ import com.ybnf.compiler.lucene.TemplateEntity;
 public class LuceneCompiler implements ICompiler {
 	private static final Logger LOG = Logger.getLogger(LuceneCompiler.class.getSimpleName());
 	public static final Map<String, SemanticService> SERVICES = new HashMap<>();
-	private static final ThreadLocal<Integer> COMPANY_ID = new ThreadLocal<>();
+	private static final ThreadLocal<Integer> APP_ID = new ThreadLocal<>();
 	private SemanticService semanticService = null;
 
 	public static void init(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
@@ -59,14 +59,14 @@ public class LuceneCompiler implements ICompiler {
 		}
 	}
 
-	public void setCompanyId(Integer companyId) {
-		COMPANY_ID.set(companyId);
+	public void setAppId(Integer appId) {
+		APP_ID.set(appId);
 	}
 
 	@Override
 	public YbnfCompileResult compile(String text) throws Exception {
 		SemanticSentence sentence = semanticService.buildSentence(text);
-		Query query = sentence.buildQuery(COMPANY_ID.get());
+		Query query = sentence.buildQuery(APP_ID.get());
 		LOG.info(Optional.ofNullable(query).map(q -> q.toString()).orElse("no query"));
 		List<TemplateEntity> entities = null;
 		try (IndexReaderService readerService = new IndexReaderService()) {
