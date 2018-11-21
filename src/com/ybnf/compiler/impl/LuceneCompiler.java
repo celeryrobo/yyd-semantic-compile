@@ -43,10 +43,9 @@ public class LuceneCompiler implements ICompiler {
 					String intentName = intentTemplate.getKey();
 					SemanticIntent intent = service.buildIntent(intentName);
 					for (String template : intentTemplate.getValue()) {
-						intent.addTemplate(template);
+						intent.addTemplate(template, writerService);
 					}
 				}
-				writerService.initSemanticService(service);
 				SERVICES.put(sceneName, service);
 			}
 		}

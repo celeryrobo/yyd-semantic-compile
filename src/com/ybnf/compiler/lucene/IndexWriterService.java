@@ -1,7 +1,6 @@
 package com.ybnf.compiler.lucene;
 
 import java.util.Collection;
-import java.util.Map;
 
 import org.ansj.library.DicLibrary;
 import org.ansj.lucene7.AnsjAnalyzer;
@@ -42,16 +41,11 @@ public class IndexWriterService extends LuceneService {
 		writer.addDocument(doc);
 	}
 
-	public void initSemanticService(SemanticService service) throws Exception {
-		String serviceName = service.getName();
-		Map<String, SemanticIntent> intents = service.getIntents();
-		for (Map.Entry<String, SemanticIntent> entry : intents.entrySet()) {
-			String intentName = entry.getKey();
-			for (Template template : entry.getValue().getTemplates()) {
-				addTemplateEntity(new TemplateEntity(0, 0, serviceName, intentName, template.getTemplate()));
-			}
-			entry.getValue().resetTemplates();
+	public void addTemplate(String service, String intent, Template template) throws Exception {
+		if("flyGame".equals(service)) {
+			System.out.println(template);
 		}
+		addTemplateEntity(new TemplateEntity(0, 0, service, intent, template.getTemplate()));
 	}
 
 	public long deleteMany(Query... queries) throws Exception {
