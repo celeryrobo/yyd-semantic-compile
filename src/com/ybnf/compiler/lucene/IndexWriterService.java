@@ -42,9 +42,6 @@ public class IndexWriterService extends LuceneService {
 	}
 
 	public void addTemplate(String service, String intent, Template template) throws Exception {
-		if("moonGame".equals(service)) {
-			System.out.println(template);
-		}
 		addTemplateEntity(new TemplateEntity(0, 0, service, intent, template.getTemplate()));
 	}
 
