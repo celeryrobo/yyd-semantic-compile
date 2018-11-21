@@ -9,12 +9,18 @@ import java.util.StringTokenizer;
 import org.ansj.util.MyStaticValue;
 
 public class Template {
+	private Integer id;
 	private String template;
 	private List<String> keywords;
 	private Set<String> entTypes;
 	private Set<String> varTypes;
 
 	public Template(String template) {
+		this(0, template);
+	}
+
+	public Template(Integer id, String template) {
+		this.id = id;
 		this.template = template;
 		this.keywords = new ArrayList<>();
 		this.entTypes = new HashSet<>();
@@ -41,6 +47,14 @@ public class Template {
 				keywords.add(word);
 			}
 		}
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public String getTemplate() {

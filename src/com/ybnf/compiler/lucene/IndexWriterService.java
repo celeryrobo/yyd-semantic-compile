@@ -42,7 +42,7 @@ public class IndexWriterService extends LuceneService {
 	}
 
 	public void addTemplate(String service, String intent, Template template) throws Exception {
-		addTemplateEntity(new TemplateEntity(0, 0, service, intent, template.getTemplate()));
+		addTemplateEntity(new TemplateEntity(template.getId(), 0, service, intent, template.getTemplate()));
 	}
 
 	public long deleteMany(Query... queries) throws Exception {
