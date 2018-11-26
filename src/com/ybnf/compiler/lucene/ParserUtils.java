@@ -42,7 +42,7 @@ public class ParserUtils {
 			}
 		} catch (Exception e) {
 			StringBuilder sb = new StringBuilder(e.getMessage());
-			sb.append("(").append(lang).append(")");
+			sb.append(" ").append(lang);
 			throw new Exception(sb.toString());
 		}
 		return new Sent(stack).build();
