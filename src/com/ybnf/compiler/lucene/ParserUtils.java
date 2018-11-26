@@ -36,8 +36,14 @@ public class ParserUtils {
 		String grammar = lang.replaceAll("\\s+", " ").trim();
 		StringTokenizer tokenizer = new StringTokenizer(grammar, "$[]()| ", true);
 		Stack<Node<?>> stack = new Stack<>();
-		while (tokenizer.hasMoreTokens()) {
-			stack.push(parser(stack, tokenizer));
+		try {
+			while (tokenizer.hasMoreTokens()) {
+				stack.push(parser(stack, tokenizer));
+			}
+		} catch (Exception e) {
+			StringBuilder sb = new StringBuilder(e.getMessage());
+			sb.append("(").append(lang).append(")");
+			throw new Exception(sb.toString());
 		}
 		return new Sent(stack).build();
 	}
