@@ -31,9 +31,7 @@ public class LuceneCompiler implements ICompiler {
 		}
 		List<String> dics = new LinkedList<>();
 		dics.add("dic");
-		for (String service : sceneIntentTemplates.keySet()) {
-			dics.add("SRV" + service);
-		}
+		sceneIntentTemplates.forEach((k, v) -> dics.add("SRV" + k));
 		try (IndexWriterService writerService = new IndexWriterService(dics)) {
 			writerService.deleteAll();
 			for (Entry<String, Map<String, List<String>>> sceneIntentTemplate : sceneIntentTemplates.entrySet()) {
@@ -42,9 +40,7 @@ public class LuceneCompiler implements ICompiler {
 				for (Entry<String, List<String>> intentTemplate : sceneIntentTemplate.getValue().entrySet()) {
 					String intentName = intentTemplate.getKey();
 					SemanticIntent intent = service.buildIntent(intentName);
-					for (String template : intentTemplate.getValue()) {
-						intent.addTemplate(template, writerService);
-					}
+					intentTemplate.getValue().forEach(e -> intent.addTemplate(e, writerService));
 				}
 				SERVICES.put(sceneName, service);
 			}
