@@ -41,8 +41,8 @@ public class IndexWriterService extends LuceneService {
 		writer.addDocument(doc);
 	}
 
-	public void addTemplate(String service, String intent, Template template) throws Exception {
-		addTemplateEntity(new TemplateEntity(template.getId(), 0, service, intent, template.getTemplate()));
+	public void addTemplate(String service, String intent, Integer appId, Template template) throws Exception {
+		addTemplateEntity(new TemplateEntity(template.getId(), appId, service, intent, template.getTemplate()));
 	}
 
 	public long deleteMany(Query... queries) throws Exception {

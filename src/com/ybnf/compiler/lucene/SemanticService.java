@@ -7,15 +7,21 @@ import java.util.Set;
 
 public class SemanticService {
 	private String name;
+	private Integer appId;
 	private Map<String, SemanticIntent> intents;
 
-	public SemanticService(String name) {
+	public SemanticService(String name, Integer appId) {
 		this.name = name;
+		this.appId = appId;
 		this.intents = new HashMap<>();
 	}
 
 	public String getName() {
 		return name;
+	}
+
+	public Integer getAppId() {
+		return appId;
 	}
 
 	public Map<String, SemanticIntent> getIntents() {
@@ -25,7 +31,7 @@ public class SemanticService {
 	public SemanticIntent buildIntent(String intentName) {
 		SemanticIntent intent = intents.get(intentName);
 		if (intent == null) {
-			intent = new SemanticIntent(name, intentName);
+			intent = new SemanticIntent(this, intentName);
 			intents.put(intentName, intent);
 		}
 		return intent;
@@ -38,12 +44,12 @@ public class SemanticService {
 			types.addAll(intent.getEntTypes());
 			varTypes.addAll(intent.getVarTypes());
 		}
-		return new SemanticSentence(name, lang, types, varTypes);
+		return new SemanticSentence(this, lang, types, varTypes);
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder(name).append("{\n");
+		StringBuilder builder = new StringBuilder(name).append("(").append(appId).append(")").append("{\n");
 		for (SemanticIntent intent : intents.values()) {
 			builder.append(intent).append("\n");
 		}

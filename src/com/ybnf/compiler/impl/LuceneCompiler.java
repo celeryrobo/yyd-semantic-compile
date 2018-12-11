@@ -29,14 +29,19 @@ public class LuceneCompiler implements ICompiler {
 		if (sceneIntentTemplates == null) {
 			return;
 		}
+		Integer appId = 0;
 		List<String> dics = new LinkedList<>();
 		dics.add("dic");
-		sceneIntentTemplates.forEach((k, v) -> dics.add("SRV" + k));
+		sceneIntentTemplates.forEach((k, v) -> {
+			StringBuilder sb = new StringBuilder("SRV-");
+			sb.append(k).append("-").append(appId);
+			dics.add(sb.toString());
+		});
 		try (IndexWriterService writerService = new IndexWriterService(dics)) {
 			writerService.deleteAll();
 			for (Entry<String, Map<String, List<String>>> sceneIntentTemplate : sceneIntentTemplates.entrySet()) {
 				String sceneName = sceneIntentTemplate.getKey();
-				SemanticService service = new SemanticService(sceneName);
+				SemanticService service = new SemanticService(sceneName, appId);
 				for (Entry<String, List<String>> intentTemplate : sceneIntentTemplate.getValue().entrySet()) {
 					String intentName = intentTemplate.getKey();
 					SemanticIntent intent = service.buildIntent(intentName);
@@ -61,7 +66,7 @@ public class LuceneCompiler implements ICompiler {
 	@Override
 	public YbnfCompileResult compile(String text) throws Exception {
 		SemanticSentence sentence = semanticService.buildSentence(text);
-		Query query = sentence.buildQuery(APP_ID.get());
+		Query query = sentence.buildQuery();
 		LOG.info(Optional.ofNullable(query).map(q -> q.toString()).orElse("no query"));
 		List<TemplateEntity> entities = null;
 		try (IndexReaderService readerService = new IndexReaderService()) {

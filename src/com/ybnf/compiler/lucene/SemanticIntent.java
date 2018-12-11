@@ -10,17 +10,19 @@ import org.nlpcn.commons.lang.tire.library.Library;
 
 public class SemanticIntent {
 	private String name;
-	private String service;
+	private SemanticService service;
 	private Set<String> entTypes;
 	private Set<String> varTypes;
 	private Forest forest;
 
-	SemanticIntent(String service, String name) {
+	SemanticIntent(SemanticService service, String name) {
 		this.name = name;
 		this.service = service;
 		this.entTypes = new HashSet<>();
 		this.varTypes = new HashSet<>();
-		this.forest = DicLibrary.get("SRV" + service);
+		StringBuilder sb = new StringBuilder("SRV-");
+		sb.append(service.getName()).append("-").append(service.getAppId());
+		this.forest = DicLibrary.get(sb.toString());
 	}
 
 	public String getName() {
@@ -41,7 +43,7 @@ public class SemanticIntent {
 		for (String keyword : template.getKeywords()) {
 			Library.insertWord(forest, new Value(keyword, "kv", "1"));
 		}
-		indexWriterService.addTemplate(service, name, template);
+		indexWriterService.addTemplate(service.getName(), name, service.getAppId(), template);
 	}
 
 	public void addTemplate(String bnfTpl, IndexWriterService indexWriterService) {

@@ -32,7 +32,7 @@ public class SemanticSentence {
 	private static final Logger LOG = Logger.getLogger(SemanticSentence.class.getSimpleName());
 	private String intent = "";
 	private String lang;
-	private String service;
+	private SemanticService service;
 	private String sentence = null;
 	private Set<String> types;
 	private Set<String> entTypes;
@@ -41,7 +41,7 @@ public class SemanticSentence {
 	private Map<String, Set<String>> sentences;
 	private ExprService dsl;
 
-	public SemanticSentence(String service, String lang, Set<String> entTypes, Set<String> varTypes) {
+	public SemanticSentence(SemanticService service, String lang, Set<String> entTypes, Set<String> varTypes) {
 		this.lang = lang;
 		this.service = service;
 		this.entTypes = entTypes;
@@ -58,7 +58,9 @@ public class SemanticSentence {
 			forests[index] = dics[index];
 		}
 		forests[index] = DicLibrary.get(); // 默认词库
-		forests[index + 1] = DicLibrary.get("SRV" + service); // 当前场景内的关键词词库
+		StringBuilder sb = new StringBuilder("SRV-");
+		sb.append(service.getName()).append("-").append(service.getAppId());
+		forests[index + 1] = DicLibrary.get(sb.toString()); // 当前场景内的关键词词库
 		initSentence(lang, forests);
 		initDslSentence(sentences);
 	}
@@ -114,7 +116,7 @@ public class SemanticSentence {
 		return this;
 	}
 
-	public Query buildQuery(Integer appId) {
+	public Query buildQuery() {
 		if (keywords.isEmpty() && types.isEmpty()) {
 			return null;
 		}
@@ -126,9 +128,9 @@ public class SemanticSentence {
 			Query query = new TermQuery(new Term("template", type.toLowerCase()));
 			booleanBuilder.add(query, Occur.SHOULD);
 		}
-		booleanBuilder.add(new TermQuery(new Term("service", service)), Occur.MUST);
-		if ("QA".equals(service)) {
-			String appIdStr = Objects.toString(appId, "0");
+		booleanBuilder.add(new TermQuery(new Term("service", service.getName())), Occur.MUST);
+		if ("QA".equals(service.getName())) {
+			String appIdStr = Objects.toString(service.getAppId(), "0");
 			booleanBuilder.add(new TermQuery(new Term("appId", appIdStr)), Occur.MUST);
 		}
 		return booleanBuilder.build();
@@ -140,7 +142,7 @@ public class SemanticSentence {
 			slots.put("intent", intent);
 		}
 		Map<String, String> objects = dsl.compile(template, lang);
-		return new YbnfCompileResult(lang, "1.0", "UTF-8", service, objects, slots);
+		return new YbnfCompileResult(lang, "1.0", "UTF-8", service.getName(), objects, slots);
 	}
 
 	public YbnfCompileResult compile(TemplateEntity templateEntity) throws Exception {
