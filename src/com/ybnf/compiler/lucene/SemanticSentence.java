@@ -41,7 +41,7 @@ public class SemanticSentence {
 	private Map<String, Set<String>> sentences;
 	private ExprService dsl;
 
-	public SemanticSentence(SemanticService service, String lang, Set<String> entTypes, Set<String> varTypes) {
+	SemanticSentence(SemanticService service, String lang, Set<String> entTypes, Set<String> varTypes) {
 		this.lang = lang;
 		this.service = service;
 		this.entTypes = entTypes;
