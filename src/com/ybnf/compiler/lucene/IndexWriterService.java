@@ -20,7 +20,8 @@ import org.nlpcn.commons.lang.util.StringUtil;
 public class IndexWriterService extends LuceneService {
 	private IndexWriter writer;
 
-	public IndexWriterService(Collection<String> dics) throws Exception {
+	public IndexWriterService(String path, Collection<String> dics) throws Exception {
+		super(path);
 		for (String dic : dics) {
 			if (!MyStaticValue.ENV.containsKey(dic)) {
 				DicLibrary.put(dic, "", new Forest());

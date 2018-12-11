@@ -17,7 +17,8 @@ public class IndexReaderService extends LuceneService {
 	private IndexReader reader;
 	private IndexSearcher searcher;
 
-	public IndexReaderService() throws Exception {
+	public IndexReaderService(String path) throws Exception {
+		super(path);
 		reader = DirectoryReader.open(directory);
 		searcher = new IndexSearcher(reader);
 	}

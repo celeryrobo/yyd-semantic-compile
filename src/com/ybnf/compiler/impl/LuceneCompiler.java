@@ -24,8 +24,10 @@ public class LuceneCompiler implements ICompiler {
 	public static final Map<String, SemanticService> SERVICES = new HashMap<>();
 	private static final ThreadLocal<Integer> APP_ID = new ThreadLocal<>();
 	private SemanticService semanticService = null;
+	private static String LUCENE_PATH;
 
-	public static void init(Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
+	public static void init(String path, Map<String, Map<String, List<String>>> sceneIntentTemplates) throws Exception {
+		LUCENE_PATH = path;
 		if (sceneIntentTemplates == null) {
 			return;
 		}
@@ -37,7 +39,7 @@ public class LuceneCompiler implements ICompiler {
 			sb.append(k).append("-").append(appId);
 			dics.add(sb.toString());
 		});
-		try (IndexWriterService writerService = new IndexWriterService(dics)) {
+		try (IndexWriterService writerService = new IndexWriterService(LUCENE_PATH, dics)) {
 			writerService.deleteAll();
 			for (Entry<String, Map<String, List<String>>> sceneIntentTemplate : sceneIntentTemplates.entrySet()) {
 				String sceneName = sceneIntentTemplate.getKey();
@@ -69,7 +71,7 @@ public class LuceneCompiler implements ICompiler {
 		Query query = sentence.buildQuery();
 		LOG.info(Optional.ofNullable(query).map(q -> q.toString()).orElse("no query"));
 		List<TemplateEntity> entities = null;
-		try (IndexReaderService readerService = new IndexReaderService()) {
+		try (IndexReaderService readerService = new IndexReaderService(LUCENE_PATH)) {
 			entities = readerService.search(query);
 		}
 		return sentence.compile(entities);
