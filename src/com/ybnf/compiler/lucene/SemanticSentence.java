@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -58,8 +57,7 @@ public class SemanticSentence {
 			forests[index] = dics[index];
 		}
 		forests[index] = DicLibrary.get(); // 默认词库
-		StringBuilder sb = new StringBuilder("SRV-");
-		sb.append(service.getName()).append("-").append(service.getAppId());
+		StringBuilder sb = new StringBuilder("SRV-").append(service.getName());
 		forests[index + 1] = DicLibrary.get(sb.toString()); // 当前场景内的关键词词库
 		initSentence(lang, forests);
 		initDslSentence(sentences);
@@ -129,10 +127,6 @@ public class SemanticSentence {
 			booleanBuilder.add(query, Occur.SHOULD);
 		}
 		booleanBuilder.add(new TermQuery(new Term("service", service.getName())), Occur.MUST);
-		if ("QA".equals(service.getName())) {
-			String appIdStr = Objects.toString(service.getAppId(), "0");
-			booleanBuilder.add(new TermQuery(new Term("appId", appIdStr)), Occur.MUST);
-		}
 		return booleanBuilder.build();
 	}
 

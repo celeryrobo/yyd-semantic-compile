@@ -31,19 +31,17 @@ public class LuceneCompiler implements ICompiler {
 		if (sceneIntentTemplates == null) {
 			return;
 		}
-		Integer appId = 0;
 		List<String> dics = new LinkedList<>();
 		dics.add("dic");
 		sceneIntentTemplates.forEach((k, v) -> {
-			StringBuilder sb = new StringBuilder("SRV-");
-			sb.append(k).append("-").append(appId);
+			StringBuilder sb = new StringBuilder("SRV-").append(k);
 			dics.add(sb.toString());
 		});
 		try (IndexWriterService writerService = new IndexWriterService(LUCENE_PATH, dics)) {
 			writerService.deleteAll();
 			for (Entry<String, Map<String, List<String>>> sceneIntentTemplate : sceneIntentTemplates.entrySet()) {
 				String sceneName = sceneIntentTemplate.getKey();
-				SemanticService service = new SemanticService(sceneName, appId);
+				SemanticService service = new SemanticService(sceneName);
 				for (Entry<String, List<String>> intentTemplate : sceneIntentTemplate.getValue().entrySet()) {
 					String intentName = intentTemplate.getKey();
 					SemanticIntent intent = service.buildIntent(intentName);

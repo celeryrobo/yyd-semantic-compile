@@ -20,8 +20,7 @@ public class SemanticIntent {
 		this.service = service;
 		this.entTypes = new HashSet<>();
 		this.varTypes = new HashSet<>();
-		StringBuilder sb = new StringBuilder("SRV-");
-		sb.append(service.getName()).append("-").append(service.getAppId());
+		StringBuilder sb = new StringBuilder("SRV-").append(service.getName());
 		this.forest = DicLibrary.get(sb.toString());
 	}
 
@@ -43,7 +42,7 @@ public class SemanticIntent {
 		for (String keyword : template.getKeywords()) {
 			Library.insertWord(forest, new Value(keyword, "kv", "1"));
 		}
-		indexWriterService.addTemplate(service.getName(), name, service.getAppId(), template);
+		indexWriterService.addTemplate(service.getName(), name, template);
 	}
 
 	public void addTemplate(String bnfTpl, IndexWriterService indexWriterService) {
