@@ -35,7 +35,6 @@ public class IndexWriterService extends LuceneService {
 	public void addTemplateEntity(TemplateEntity entity) throws Exception {
 		Document doc = new Document();
 		doc.add(new StringField("id", entity.getId().toString(), Store.YES));
-		doc.add(new StringField("appId", entity.getAppId().toString(), Store.YES));
 		doc.add(new StringField("service", entity.getService(), Store.YES));
 		doc.add(new StringField("intent", entity.getIntent(), Store.YES));
 		doc.add(new TextField("template", entity.getTemplate(), Store.YES));
@@ -43,7 +42,7 @@ public class IndexWriterService extends LuceneService {
 	}
 
 	public void addTemplate(String service, String intent, Template template) throws Exception {
-		addTemplateEntity(new TemplateEntity(template.getId(), 0, service, intent, template.getTemplate()));
+		addTemplateEntity(new TemplateEntity(template.getId(), service, intent, template.getTemplate()));
 	}
 
 	public long deleteMany(Query... queries) throws Exception {
