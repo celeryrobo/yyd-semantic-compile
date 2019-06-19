@@ -47,11 +47,17 @@ public class YbnfCompileResult {
 	public Map<String, String> getSlots() {
 		return slots;
 	}
+	
+	public void setSlots(Map<String, String> slots) {
+		this.slots = slots;
+	}
 
 	@Override
 	public String toString() {
 		return "YbnfCompileResult [text=" + text + ", version=" + version + ", charset=" + charset + ", service="
 				+ service + ", objects=" + objects + ", slots=" + slots + "]";
 	}
+
+	
 
 }
